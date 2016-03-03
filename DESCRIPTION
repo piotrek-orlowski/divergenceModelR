@@ -1,0 +1,19 @@
+Package: divergenceModelR
+Type: Package
+Title: Divergence pricing and divergence-based affine model estimation
+Version: 0.0.1
+Date: 2016-02-05
+Author: Piotr Or{\l}owski
+Maintainer: Piotr Or{\l}owski <piotrek.orlowski@gmail.com>
+Description: Pricing and estimation algorithms for affine jump diffusion models for divergence contracts (see Schneider and Trojani, ``Divergence and the Price of Uncertainty'')
+License: GPL > 2.0?
+Depends: affineModelR,
+		 SparseGrid
+Imports: Rcpp,
+         RcppArmadillo,
+         ukfRcpp
+LinkingTo: 
+  Rcpp,
+  RcppArmadillo,
+  ukfRcpp,
+  affineModelR
