@@ -14,6 +14,8 @@ Rcpp::List affineObservationStateHandler(arma::mat stateMat, Rcpp::List modelPar
 // In state mat, additionally, to state values, we carry the past filtered state
 // because it is necessary to calculate effects of stock return observation.
 
+int Nf = stateMat.n_rows/2;
+
 // Initialize return list
 Rcpp::List res;
 
@@ -31,18 +33,20 @@ Rcpp::List stockMeanIndividual = Rcpp::List::create(stockParamsMeanVec[0]);
 // Initialize a vector for stock means, length = number of states in evaluation
 arma::vec stockMeans(stateMat.n_cols);
 
-// Calculate expected stock returns
+// Calculate expected stock returns at previous state
 for(int kcol = 0; kcol < stateMat.n_cols; kcol++){
-  stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.col(kcol)));
+  stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.submat(Nf,kcol,2*Nf-1,kcol)));
+  // stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.col(kcol)));
 }
 
 // Start working on the covariance matrix between stock return and states.
-arma::vec stockAndVolMeans = meanVecFun(stockParamsMeanVec, stateMat.col(0));
+arma::vec stockAndVolMeans = meanVecFun(stockParamsMeanVec, stateMat.submat(Nf,0,2*Nf-1,0));
+// arma::vec stockAndVolMeans = meanVecFun(stockParamsMeanVec, stateMat.col(0));
 arma::vec covDim(2);
 covDim.fill(stockParamsMeanVec.length());
 
 // Covariance matrix and beta of stock on vol factors
-arma::mat stockAndVolCov = covMatFun(stockParams["cov.array"], covDim, stateMat.col(0)) - stockAndVolMeans * stockAndVolMeans.t();
+arma::mat stockAndVolCov = covMatFun(stockParams["cov.array"], covDim, stateMat.submat(Nf,0,2*Nf-1,0)) - stockAndVolMeans * stockAndVolMeans.t();
 arma::mat stockAndVolBeta = stockAndVolCov.submat(0,1,0,stockAndVolCov.n_cols-1) * arma::inv(stockAndVolCov.submat(1,1,stockAndVolCov.n_rows-1,stockAndVolCov.n_cols-1));
 
 // This is the residual volatility of the stock that is not coming from vol
@@ -53,11 +57,11 @@ arma::mat stockNoise = stockAndVolCov(0,0) - stockAndVolBeta.t() * stockAndVolCo
 arma::cube cfCoeffs = Rcpp::as<arma::cube>(modelParameters["cfCoeffs"]);
 arma::vec pVec = Rcpp::as<arma::vec>(modelParameters["pVec"]);
 
-arma::cube divPrices = divergenceSwapRateCpp(pVec, cfCoeffs, stateMat.t());
+arma::cube divPrices = divergenceSwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,Nf-1).t());
 
-arma::cube skewPrices = skewnessSwapRateCpp(pVec, cfCoeffs, stateMat.t());
+arma::cube skewPrices = skewnessSwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,Nf-1).t());
 
-arma::cube quartPrices = quarticitySwapRateCpp(pVec, cfCoeffs, stateMat.t());
+arma::cube quartPrices = quarticitySwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,Nf-1).t());
 
 // Write into return structures
 int T = divPrices.n_cols;
@@ -70,7 +74,7 @@ arma::mat tempDivergencePrices(U*T,1);
 for(int kcol=0; kcol < stateMat.n_cols; kcol++){
   // Write mean returns
   yhat(0,kcol) = stockMeans(kcol);
-
+  yhat(0,kcol) += arma::as_scalar(stockAndVolBeta * (stateMat.submat(0,kcol,Nf-1,kcol) - stateMat.submat(Nf,kcol,2*Nf-1,kcol)));
   // Write divergence prices
   tempPrices.reshape(U,T);
   tempPrices = divPrices.slice(kcol);
@@ -106,10 +110,11 @@ obsNoiseMat(0,0) = stockNoise(0,0);
 arma::vec tVec = Rcpp::as<arma::vec>(modelParameters["tVec"]);
 arma::vec bVec = Rcpp::as<arma::vec>(modelParameters["bVec"]);
 arma::vec cVec = Rcpp::as<arma::vec>(modelParameters["cVec"]);
-double spotVol = arma::accu(stateMat.col(0));
+// double spotVol = arma::accu(stateMat.col(0));
+double spotVol = arma::accu(stateMat.submat(0,0,Nf-1,0));
 obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divModelObsNoiseMat(cVec,bVec,spotVol,tVec,U);
 
-res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("residnoise") = obsNoiseMat);
+res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obsNoiseMat") = obsNoiseMat);
 
 return res;
 }
