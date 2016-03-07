@@ -12,9 +12,27 @@ List testAffineFilter(const arma::mat testDataMat, const arma::vec testInitState
   stateHandler transitionPtr = &affineTransitionStateHandler;
   stateHandler observationPtr = &affineObservationStateHandler;
   
-  ukfRcpp filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, testModelParams);
+  ukfClass filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, testModelParams);
   
   filterInstance.filterAdditiveNoise();
+  
+  List res;
+  
+  res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube());
+  
+  return res;
+}
+
+//' @export
+//[[Rcpp::export]]
+List testSqrtAffineFilter(const arma::mat testDataMat, const arma::vec testInitState, const arma::mat testInitProcCov, const List testModelParams){
+  
+  stateHandler transitionPtr = &affineTransitionStateHandler;
+  stateHandler observationPtr = &affineObservationStateHandler;
+  
+  ukfClass filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, testModelParams);
+  
+  filterInstance.filterSqrtAdditiveNoise();
   
   List res;
   

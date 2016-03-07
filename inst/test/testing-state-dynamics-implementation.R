@@ -37,7 +37,7 @@ initState <- matrix(c(1,1), ncol = 1)
 initVol <- matrix(0,2,2)
 initVol[1,1] <- covMatFun(covListS = aa$cov.array[c(1,2,4)], covListDim = c(2,2) ,  currVol = initState[1,1,drop=F])[2,2]
 
-Ndays <- 4000
+Ndays <- 400
 
 paths <- affineSimulate(paramsList = parListHestonLev, N.factors = 1, t.days = Ndays, t.freq = 1, freq.subdiv = 78)
 stock.ret <- paths$S.array[seq(1,Ndays,by=5),"F"]
@@ -67,6 +67,7 @@ sink(file = 'ftestlog.txt', append = F, type = 'output')
 for(kk in 1:1000){
   print(paste("iteration",kk,"started"))
   ftest <- testAffineFilter(testDataMat = obsData, testInitState = initState, testInitProcCov = initVol, testModelParams = list(transition = transParameters, observation = obsParameters))
+  ftestSqrt <- testSqrtAffineFilter(testDataMat = obsData, testInitState = initState, testInitProcCov = initVol, testModelParams = list(transition = transParameters, observation = obsParameters))
 }
 sink(NULL)
 ftestsame <- testAffineFilter(testDataMat = obsData, testInitState = initState, testInitProcCov = initVol, testModelParams = list(transition = transParameters, observation = obsParameters))
