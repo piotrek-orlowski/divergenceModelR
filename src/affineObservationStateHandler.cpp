@@ -81,9 +81,9 @@ for(int kcol=0; kcol < stateMat.n_cols; kcol++){
   tempPrices.reshape(U*T,1);
   // save divergence prices for standardising skewness and kurtosis
   tempDivergencePrices = tempPrices;
-
   yhat(arma::span(1,U*T),kcol) = tempPrices;
-  // Write skewness prices
+
+    // Write skewness prices
   tempPrices.reshape(U,T);
   tempPrices = skewPrices.slice(kcol);
   tempPrices.reshape(U*T,1);

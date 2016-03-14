@@ -12,7 +12,7 @@ arma::cube divergenceSwapRateCpp(const arma::vec& p, const arma::cube& coeffs, c
   
   // First calculate CF values and less 1
   cfVals = affineModelR::affineCFevalCpp(coeffs.slices(0,stateMat.n_cols),stateMat,false);
-  cfVals.transform([](double x){return(x-1.0);});
+  cfVals -= arma::ones(arma::size(cfVals));
   // Rescale for p different from 0 and 1
   for(int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
@@ -55,7 +55,7 @@ arma::cube skewnessSwapRateCpp(const arma::vec& p, const arma::cube& coeffs, con
   // First calculate CF values and less 1
   cfAndDerivVals = affineModelR::affineCFderivsEvalCpp(coeffs,stateMat);
   cfVals = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(0,stateMat.n_rows-1));
-  cfVals.transform([](double x){return(x-1.0);});
+  cfVals -= arma::ones(arma::size(cfVals));
   
   // collect cf derivs in more convenient containers
   arma::cube cfFirstDeriv = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(stateMat.n_rows, 2*stateMat.n_rows-1));
@@ -106,7 +106,7 @@ arma::cube quarticitySwapRateCpp(const arma::vec& p, const arma::cube& coeffs, c
   // First calculate CF values and less 1
   cfAndDerivVals = affineModelR::affineCFderivsEvalCpp(coeffs,stateMat);
   cfVals = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(0,stateMat.n_rows-1));
-  cfVals.transform([](double x){return(x-1.0);});
+  cfVals -= arma::ones(arma::size(cfVals));
   
   // collect cf derivs in more convenient containers
   arma::cube cfFirstDeriv = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(stateMat.n_rows, 2*stateMat.n_rows-1));

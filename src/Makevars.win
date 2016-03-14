@@ -2,4 +2,5 @@
 ## This assume that we can call Rscript to ask Rcpp about its locations
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_LIBS = $(shell $(R_HOME)/bin/Rscript.exe -e "Rcpp:::LdFlags()") $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -Lc:/Libs/R/affineModelR/libs/x64 -laffineModelR -Lc:/Libs/R/ukfRcpp/libs/x64 -lukfRcpp
-PKG_CXXFLAGS = -fpermissive -std=c++0x -Ic:/Libs/R/affineModelR/include -Ic:/Libs/R/ukfRcpp/include
+PKG_CXXFLAGS = -fpermissive -Ic:/Libs/R/affineModelR/include -Ic:/Libs/R/ukfRcpp/include
+# Never try c++11 on Windows, lesson learned. It works until it doesn't.
