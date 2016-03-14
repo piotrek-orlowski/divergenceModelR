@@ -33,7 +33,7 @@ arma::mat divModelObsNoiseMat(const arma::vec& corrs, arma::vec& bpars, double s
   
   spotVar = sqrt(spotVar);
   bpars *= spotVar;
-  arma::mat btimeVar = arma::kron(bpars,arma::kron(arma::pow(matVec,0.25),arma::ones(U)));
+  arma::mat btimeVar = arma::kron(bpars,arma::kron(arma::pow(matVec,-0.25),arma::ones(U)));
   arma::mat btimeVarDiag = arma::diagmat(btimeVar);
   
   // res = corrBig;

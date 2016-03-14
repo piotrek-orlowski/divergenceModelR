@@ -18,7 +18,7 @@ List testAffineFilter(const arma::mat testDataMat, const arma::vec testInitState
   
   List res;
   
-  res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube());
+  res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL());
   
   return res;
 }
@@ -36,7 +36,7 @@ List testSqrtAffineFilter(const arma::mat testDataMat, const arma::vec testInitS
   
   List res;
   
-  res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube());
+  res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL());
   
   return res;
 }
