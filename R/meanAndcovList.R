@@ -16,10 +16,19 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
   
   # first calculate mean propagation lists
   stock.struct <- condStockChange(ret.period=dT)
-  mean.lists <- list(momentCondition(params.P = params.P,params.Q = params.Q,condition.struct=stock.struct,conditional=TRUE,rtol=rtol,jumpTransform = jumpTransform,mod.type = mod.type,...))
+  mean.lists <- list(momentCondition(params.P,params.Q,jumpTransform = jumpTransform,condition.struct=stock.struct,conditional=TRUE,rtol=rtol,...))
+  
+  u.t.mat <- matrix(c(u=0,t=1),nrow=1)
+  U <- 1
   
   # create function list. First is stock, then U portfolios and then the vol factors
   list.fun <- list(function(x) condStockChange(ret.period=hedge.freq, ret.start = x,N.factors=N.factors))
+  
+  for (uu in 1:U) {
+    list.fun <- append(list.fun,values=function(x) condGeneratePortfolio(u.vec=u.t.mat[uu,1],tau.js=x,deltas=hedge.freq,ttm=u.t.mat[uu,2], N.factors=N.factors))
+    environment(list.fun[[length(list.fun)]]) <- new.env()
+    assign("uu",uu,environment(list.fun[[length(list.fun)]]))
+  }
   
   # now add vol factors
   for (vv in 1:N.factors) {
@@ -33,17 +42,17 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
   quad.2d <- createSparseGrid(type="KPU",dimension=2,k=N.points)
   
   # initialize lists that will hold the structures
-  mean.vec <- array(list(),c(1+N.factors))
+  mean.vec <- array(list(),c(1+U+N.factors))
   
   # we need to seperately do the 2d (autocovariance terms) and 1d quad (variance terms)
-  cov.array <- array(list(),c(rep(1+N.factors,2)))
-
+  cov.array <- array(list(),c(rep(1+U+N.factors,2)))
+  
   # calculate mean list
   for (nn in 1:length(list.fun)) {
     m.list <- list(a=NULL,b=NULL,linCoeff=NULL)
     for (qq in 1:length(quad.1d$nodes)) {
       m1 <- list.fun[[nn]](dT * quad.1d$nodes[qq])
-      ab <- momentCondition(params.P,params.Q,condition.struct=m1,conditional=TRUE,rtol=rtol,N.factors=N.factors,jumpTransform = jumpTransform, mod.type = mod.type,...)
+      ab <- momentCondition(params.P,params.Q,jumpTransform = jumpTransform,condition.struct=m1,conditional=TRUE,rtol=rtol,N.factors=N.factors,...)
       m.list$a <- c(m.list$a,ab$a)
       m.list$b <- rbind(m.list$b,ab$b)
       m.list$linCoeff <- c(m.list$linCoeff,ab$linCoeff * quad.1d$weights[qq] * dT / hedge.freq)
@@ -59,8 +68,8 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
         m1 <- list.fun[[nn1]](dT * quad.2d$nodes[qq,1]-hedge.freq)
         m2 <- list.fun[[nn2]](dT * quad.2d$nodes[qq,2])
         m.12 <- condMultiply(m1,m2,N.factors=N.factors)
-        ab <- momentCondition(params.P,params.Q,condition.struct=m.12,conditional=TRUE,rtol=rtol,N.factors=N.factors,jumpTransform = jumpTransform, mod.type = mod.type,...)
-              
+        ab <- momentCondition(params.P,params.Q,jumpTransform = jumpTransform,condition.struct=m.12,conditional=TRUE,rtol=rtol,N.factors=N.factors,...)
+        
         m.list$a <- c(m.list$a, ab$a)
         m.list$b <- rbind(m.list$b, ab$b)
         m.list$linCoeff <- c(m.list$linCoeff, ab$linCoeff * quad.2d$weights[qq] * (dT / hedge.freq)^2)
@@ -70,7 +79,7 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
         m2 <- list.fun[[nn2]](dT * quad.1d$nodes[qq])
         m.12 <- condMultiply(m1,m2,N.factors=N.factors)
         
-        ab <- momentCondition(params.P,params.Q,condition.struct=m.12,conditional=TRUE,rtol=rtol,N.factors=N.factors,jumpTransform=jumpTransform,mod.type = mod.type,...)
+        ab <- momentCondition(params.P,params.Q,jumpTransform = jumpTransform,condition.struct=m.12,conditional=TRUE,rtol=rtol,N.factors=N.factors,...)
         # we could in principle substract means here to, but it's a smaller order, so not relevant
         m.list$a <- c(m.list$a,ab$a)
         m.list$b <- rbind(m.list$b,ab$b)
@@ -80,5 +89,5 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
     }
   }
   
-  return(list(mean.vec = mean.vec, cov.array = cov.array, cov.list = cov.array[lower.tri(cov.array,diag=TRUE)]))
+  return(list(mean.vec = mean.vec[-2], cov.array = cov.array[-2,-2], cov.list = cov.array[-2,-2][lower.tri(diag(N.factors+1),diag=TRUE)]))
 }
