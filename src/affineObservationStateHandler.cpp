@@ -55,6 +55,7 @@ arma::mat stockNoise = stockAndVolCov(0,0) - stockAndVolBeta * stockAndVolCov.su
 // Evaluate divergence prices
 arma::cube cfCoeffs = Rcpp::as<arma::cube>(modelParameters["cfCoeffs"]);
 arma::vec pVec = Rcpp::as<arma::vec>(modelParameters["pVec"]);
+arma::vec tVec = Rcpp::as<arma::vec>(modelParameters["tVec"]);
 
 arma::cube divPrices = divergenceSwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,Nf-1).t());
 
@@ -65,6 +66,13 @@ arma::cube quartPrices = quarticitySwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,N
 // Write into return structures
 int T = divPrices.n_cols;
 int U = divPrices.n_rows;
+
+arma::vec tVecPricing(U*T,1);
+for(int uu = 0; uu < U; uu++){
+  for(int tt = 0; tt < T; tt++){
+    tVecPricing(uu + tt*U) = tVec(tt);
+  }
+}
 
 arma::mat yhat(1+U*T*3,stateMat.n_cols);
 
@@ -80,7 +88,7 @@ for(int kcol=0; kcol < stateMat.n_cols; kcol++){
   tempPrices.reshape(U*T,1);
   // save divergence prices for standardising skewness and kurtosis
   tempDivergencePrices = tempPrices;
-  yhat(arma::span(1,U*T),kcol) = tempPrices;
+  yhat(arma::span(1,U*T),kcol) = tempPrices % arma::pow(tVecPricing,-1.0);
 
     // Write skewness prices
   tempPrices.reshape(U,T);
@@ -106,7 +114,6 @@ arma::mat obsNoiseMat(1+3*U*T,1+3*U*T,arma::fill::zeros);
 obsNoiseMat(0,0) = stockNoise(0,0);
 
 // extract observation noise params
-arma::vec tVec = Rcpp::as<arma::vec>(modelParameters["tVec"]);
 arma::vec bVec = Rcpp::as<arma::vec>(modelParameters["bVec"]);
 arma::vec cVec = Rcpp::as<arma::vec>(modelParameters["cVec"]);
 // double spotVol = arma::accu(stateMat.col(0));
