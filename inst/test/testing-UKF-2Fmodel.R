@@ -33,36 +33,40 @@ stock.ret <- diff(stock.ret)/head(stock.ret,-1)
 
 vols <- tail(paths$V.array[seq(1,Ndays,by=5),c("v1","v2")],-1)
 
-dvrg <- divergenceSwapRate(p = c(0,1/2), params.Q = parList$Q, t.vec = mkt.spec$t, vol.mat = vols, mod.type = 'standard', jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'))
+dvrg <- divergenceSwapRate(p = c(0.1,1/2), params.Q = parList$Q, t.vec = mkt.spec$t, vol.mat = vols, mod.type = 'standard', jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'))
 
-skew <- skewSwapRate(p = c(0,1/2), params.Q = parList$Q, t.vec = mkt.spec$t, vol.mat = vols, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), mod.type = 'standard')
+skew <- skewSwapRate(p = c(0.1,1/2), params.Q = parList$Q, t.vec = mkt.spec$t, vol.mat = vols, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), mod.type = 'standard')
 
-quart <- quartSwapRate(p = c(0,1/2), params.Q = parList$Q, t.vec = mkt.spec$t, vol.mat = vols, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), mod.type = 'standard')
+quart <- quartSwapRate(p = c(0.1,1/2), params.Q = parList$Q, t.vec = mkt.spec$t, vol.mat = vols, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), mod.type = 'standard')
 
 # obsData <- cbind(stock.ret,t(dvrg[1,,]),t(skew[1,,])/t(dvrg[1,,]^1.5),t(quart[1,,])/t(dvrg[1,,]^2))
-if(dim(dvrg)[2]==1 & dim(dvrg)[1]==1){
-  obsData <- cbind(stock.ret,drop(dvrg),drop(skew)/drop(dvrg^1.5),drop(quart)/drop(dvrg^2))
-} else if((dim(dvrg)[2]==1 & dim(dvrg)[1]>1) | (dim(dvrg)[1]==1 & dim(dvrg)[2]>1)) {
-  obsData <- cbind(stock.ret,t(drop(dvrg)),t(drop(skew)/drop(dvrg^1.5)),t(drop(quart)/drop(dvrg^2)))
-} else {
-  obsData <- cbind(stock.ret,matrix(dvrg,nrow=dim(dvrg)[3],ncol = sum(dim(dvrg)[1:2])),matrix(drop(skew)/drop(dvrg^1.5),nrow=dim(dvrg)[3],ncol = sum(dim(dvrg)[1:2])),matrix(drop(quart)/drop(dvrg^2),nrow=dim(dvrg)[3],ncol = sum(dim(dvrg)[1:2])))
+obsData <- matrix(0,nrow = length(stock.ret), ncol = 1+3*prod(dim(dvrg)[1:2]))
+obsData[,1] <- stock.ret
+for(kk in 1:nrow(obsData)){
+  obsData[kk,2:5] <- as.numeric(dvrg[,,kk])/rep(mkt.spec$t,each=2)
+  obsData[kk,6:9] <- as.numeric(skew[,,kk])/as.numeric(dvrg[,,kk])^1.5
+  obsData[kk,10:13] <- as.numeric(quart[,,kk])/as.numeric(dvrg[,,kk])^2
 }
 
 obsDataTrue <- obsData
 for(kk in 1:nrow(vols)){
-  err <- t(chol(divModelObsNoiseMat(corrs = rep(0.7,3), bpars = c(0.001,0.0020,0.0030), spotVar = vols[kk], matVec = mkt.spec$t, U = dim(dvrg)[1]))) %*% rnorm(ncol(obsData)-1)
+  err <- t(chol(divModelObsNoiseMat(corrs = rep(0.0,3), bpars = c(0.001,0.0020,0.0030), spotVar = vols[kk], matVec = mkt.spec$t, U = dim(dvrg)[1]))) %*% rnorm(ncol(obsData)-1)
   obsData[kk,-1] <- obsData[kk,-1] + err
 }
 
 # ---- MODEL RUN ----
 
-ode.solutions <- Re(odeExtSolveWrap(u = matrix(c(0,0,0,0.5,0,0),nrow=2, ncol=3,byrow=T), params.P = parList$P, params.Q = parList$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), N.factors = 2, mod.type = 'standard', rtol = 1e-12, atol = 1e-28))
+ode.solutions <- Re(odeExtSolveWrap(u = matrix(c(0.1,0,0,0.5,0,0),nrow=2, ncol=3,byrow=T), params.Q = parList$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), N.factors = 2, mod.type = 'standard', rtol = 1e-12, atol = 1e-28))
 
-data.structure <- list(obs.data = obsData, spec.mat = expand.grid(t = mkt.spec$t, p = c(0,0.5), type = c("div","skew","quart")))
+dvrg_c <- divergenceSwapRateCpp(p = c(0.1,0.5), coeffs = ode.solutions, stateMat = vols)
 
-model.spec <- list(params.P = parList$P, params.Q = parList$Q, jump.type = 'kouExpJumpTransform', dt = 5/252, N.factors  = 2, error = list(cVec=rep(0.7,3), bVec = c(0.001,0.0020,0.0030)), mkt = mkt.spec)
+data.structure <- list(obs.data = obsData, spec.mat = expand.grid(t = mkt.spec$t, p = c(0.1,0.5), type = c("div","skew","quart")))
+
+model.spec <- list(params.P = parList$P, params.Q = parList$Q, jump.type = 'kouExpJumpTransform', dt = 5/252, N.factors  = 2, error = list(cVec=rep(0.0,3), bVec = c(0.001,0.0020,0.0030)), mkt = mkt.spec)
 
 lik.test <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter)
+
+# lik.test.simpleFilter <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_filter)
 
 # ---- NOT RUN ----
 
