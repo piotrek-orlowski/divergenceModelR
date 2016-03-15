@@ -7,7 +7,7 @@
 #' @param ... further arguments passed to \code{\link{twoFactorJumpODEsSolveP}}
 #' @export
 #' @return Returns the value (unconditional P expectation) of the specified product.
-momentCondition <- function(params.P, params.Q, condition.struct, conditional=FALSE, atol = 1e-12,rtol=1e-8, rtol.Q=rtol, N.factors = (length(params.P)-1), jumpTransform = getPointerToJumpTransform('expNormJumpTransform')$TF, mod.type = 'standard',...) {
+momentCondition <- function(params.P, params.Q, condition.struct, conditional=FALSE, atol = 1e-30, rtol=1e-12, rtol.Q=rtol, N.factors = (length(params.P)-1), jumpTransform = getPointerToJumpTransform('expNormJumpTransform')$TF, mod.type = 'standard',...) {
   # make sure constants can be left out
   stopifnot(abs(sum(condition.struct$linTrans[1,])) < 1e-12)
   

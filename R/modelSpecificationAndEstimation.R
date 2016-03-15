@@ -27,13 +27,12 @@ modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, 
   # solve ODEs for pricing
   ode.solutions <- Re(odeExtSolveWrap(
         u = cbind(unique(spec.mat[,"p"]),matrix(0,length(unique(spec.mat[,"p"])),N.factors)), 
-        params.P = parListHestonLev$P, 
-        params.Q = parListHestonLev$Q, 
+        params.Q = params.Q, 
         mkt = mkt.spec, 
         jumpTransform = getPointerToJumpTransform(jump.type), 
-        N.factors = 1, 
+        N.factors = N.factors, 
         mod.type = 'standard', 
-        rtol = 1e-8, atol = 1e-12
+        rtol = 1e-12, atol = 1e-28
       ))
   
   # Calculate model dynamics coefficients
@@ -45,8 +44,8 @@ modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, 
         jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
         N.points = 2,
         mod.type = 'standard', 
-        rtol = 1e-8, 
-        atol = 1e-12
+        rtol = 1e-12, 
+        atol = 1e-30
       )
   
   # Transition equation setup
@@ -67,19 +66,26 @@ modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, 
       )
   
   # Initial state value
-  init.state <- affineCF(
-        u = rbind(rep(0,N.factors+1),matrix(c(0,rep(1e-5,N.factors)),nrow = 1, ncol = N.factors+1)), 
-        params.Q = params.Q, 
-        params.P = params.P, 
-        t.vec = 10, 
-        v.0 = matrix(1,nrow=1,ncol=N.factors), 
-        jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
-        N.factors = N.factors, 
-        CGF = FALSE, 
-        mod.type = 'standard', 
-        atol = 1e-12, 
-        rtol = 1e-8
-      )
+  init.state <- matrix(0,nrow = 2, ncol = N.factors)
+  for(kk in 1:N.factors){
+    deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
+    deriv.u[2,kk+1] <- 1e-5
+    init.state.loc <- affineCF(
+      u = deriv.u, 
+      params.Q = params.Q, 
+      params.P = params.P, 
+      t.vec = 10, 
+      v.0 = matrix(1,nrow=1,ncol=N.factors), 
+      jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
+      N.factors = N.factors, 
+      CGF = FALSE, 
+      mod.type = 'standard', 
+      atol = 1e-12, 
+      rtol = 1e-8
+    )
+    init.state[,kk] <- drop(init.state.loc)
+  }
+  
   init.state <- drop(init.state)
   if(is.null(dim(init.state))){
     init.state <- matrix(init.state,ncol=1)
@@ -90,7 +96,7 @@ modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, 
   init.vol[1:N.factors,1:N.factors] <- covMatFun(
           covListS = vol.cov.array[lower.tri(x = diag(N.factors),diag = T)], 
           covListDim = c(N.factors,N.factors),  
-          currVol = initState[1:N.factors,1,drop=F]
+          currVol = init.state[1:N.factors,1,drop=F]
         )
   
   filtering.result <- filterFoo(

@@ -12,8 +12,7 @@ using namespace std;
 Rcpp::List affineObservationStateHandler(arma::mat stateMat, Rcpp::List modelParameters){
 
 // In state mat, additionally, to state values, we carry the past filtered state
-// because it is necessary to calculate effects of stock return observation.
-
+// because it is necessary to calculate effects of stock return observation
 int Nf = stateMat.n_rows/2;
 
 // Initialize return list
@@ -51,7 +50,7 @@ arma::mat stockAndVolBeta = stockAndVolCov.submat(0,1,0,stockAndVolCov.n_cols-1)
 
 // This is the residual volatility of the stock that is not coming from vol
 // co-movement. This will go into the observation noise matrix position (1,1)
-arma::mat stockNoise = stockAndVolCov(0,0) - stockAndVolBeta.t() * stockAndVolCov.submat(1,1,stockAndVolCov.n_rows-1,stockAndVolCov.n_cols-1) * stockAndVolBeta;
+arma::mat stockNoise = stockAndVolCov(0,0) - stockAndVolBeta * stockAndVolCov.submat(1,1,stockAndVolCov.n_rows-1,stockAndVolCov.n_cols-1) * stockAndVolBeta.t();
 
 // Evaluate divergence prices
 arma::cube cfCoeffs = Rcpp::as<arma::cube>(modelParameters["cfCoeffs"]);
