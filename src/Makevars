@@ -1,5 +1,5 @@
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lz -L/mnt/beegfs/alphacruncher.net/orlowskip/RLibs/ukfRcpp/libs/ukfRcpp.so -L/mnt/beegfs/alphacruncher.net/orlowskip/RLibs/affineModelR/libs/affineModelR.so
+PKG_LIBS += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lz -L"/mnt/beegfs/alphacruncher.net/orlowskip/lib/lib" -l:ukfRcpp.so -l:affineModelR.so
 PKG_CPPFLAGS= -fpermissive
-PKG_CXXFLAGS= -fpermissive -std=c++0x -I/mnt/beegfs/alphacruncher.net/orlowskip/RLibs/affineModelR/include -I/mnt/beegfs/alphacruncher.net/orlowskip/RLibs/ukfRcpp/include
+PKG_CXXFLAGS += -fpermissive -std=c++0x -I/mnt/beegfs/alphacruncher.net/orlowskip/RLibs/affineModelR/include -I/mnt/beegfs/alphacruncher.net/orlowskip/RLibs/ukfRcpp/include
 PKG_CFLAGS= -fpermissive
