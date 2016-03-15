@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include "ukfClass.h"
 #include "handlers.h"
+#include "stateAdmissibilityControl.h"
 using namespace std;
 using namespace Rcpp;
 
@@ -11,8 +12,9 @@ List testAffineFilter(const arma::mat testDataMat, const arma::vec testInitState
   
   stateHandler transitionPtr = &affineTransitionStateHandler;
   stateHandler observationPtr = &affineObservationStateHandler;
+  stateControl controlPtr = &affineAdditiveStateController;
   
-  ukfClass filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, testModelParams);
+  ukfClass filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, controlPtr, testModelParams);
   
   filterInstance.filterAdditiveNoise();
   
@@ -29,8 +31,9 @@ List testSqrtAffineFilter(const arma::mat testDataMat, const arma::vec testInitS
   
   stateHandler transitionPtr = &affineTransitionStateHandler;
   stateHandler observationPtr = &affineObservationStateHandler;
+  stateControl controlPtr = &affineAdditiveStateController;
   
-  ukfClass filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, testModelParams);
+  ukfClass filterInstance(testDataMat, testInitState, testInitProcCov, transitionPtr, observationPtr, controlPtr, testModelParams);
   
   filterInstance.filterSqrtAdditiveNoise();
   

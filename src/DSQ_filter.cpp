@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include "ukfClass.h"
 #include "handlers.h"
+#include "stateAdmissibilityControl.h"
 using namespace std;
 using namespace Rcpp;
 
@@ -13,9 +14,10 @@ List DSQ_filter(const arma::mat dataMat, const arma::vec initState, const arma::
 // Set state handlers  
 stateHandler transitionPtr = &affineTransitionStateHandler;
 stateHandler observationPtr = &affineObservationStateHandler;
+stateControl controlPtr = &affineAdditiveStateController;
 
 // Instantiate filter instance
-ukfClass filterInstance(dataMat, initState, initProcCov, transitionPtr, observationPtr, modelParams);
+ukfClass filterInstance(dataMat, initState, initProcCov, transitionPtr, observationPtr, controlPtr, modelParams);
 
 // Run filter
 filterInstance.filterAdditiveNoise();
