@@ -9,7 +9,7 @@ using namespace std;
 // [[Rcpp::export]]
 Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelParameters){
   // We propagate the past and current state. As such, stateMat.n_rows = 2*N.factors
-  int Nf = stateMat.n_rows/2;
+  unsigned int Nf = stateMat.n_rows/2;
   
   Rcpp::List res;
   
@@ -25,7 +25,7 @@ Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelPara
     // meanMat.col(kcol) = meanVecFun(meanList, stateMat.col(kcol));
   }
   
-  arma::vec covDim(2);
+  arma::uvec covDim(2);
   covDim(0) = Nf;
   covDim(1) = Nf;
   

@@ -15,9 +15,6 @@ Rcpp::List affineObservationStateHandler(arma::mat stateMat, Rcpp::List modelPar
 // because it is necessary to calculate effects of stock return observation
 int Nf = stateMat.n_rows/2;
 
-// Initialize return list
-Rcpp::List res;
-
 // Grab stock parameters  
 Rcpp::List stockParams = modelParameters["stockParams"];
 
@@ -31,6 +28,7 @@ Rcpp::List stockMeanIndividual = Rcpp::List::create(stockParamsMeanVec[0]);
 
 // Initialize a vector for stock means, length = number of states in evaluation
 arma::vec stockMeans(stateMat.n_cols);
+stockMeans.fill(0.0);
 
 // Calculate expected stock returns at previous state
 for(unsigned int kcol = 0; kcol < stateMat.n_cols; kcol++){
@@ -41,7 +39,7 @@ for(unsigned int kcol = 0; kcol < stateMat.n_cols; kcol++){
 // Start working on the covariance matrix between stock return and states.
 arma::vec stockAndVolMeans = meanVecFun(stockParamsMeanVec, stateMat.submat(Nf,0,2*Nf-1,0));
 // arma::vec stockAndVolMeans = meanVecFun(stockParamsMeanVec, stateMat.col(0));
-arma::vec covDim(2);
+arma::uvec covDim(2);
 covDim.fill(stockParamsMeanVec.length());
 
 // Covariance matrix and beta of stock on vol factors
@@ -64,20 +62,20 @@ arma::cube skewPrices = skewnessSwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,Nf-1
 arma::cube quartPrices = quarticitySwapRateCpp(pVec, cfCoeffs, stateMat.rows(0,Nf-1).t());
 
 // Write into return structures
-int T = divPrices.n_cols;
-int U = divPrices.n_rows;
+unsigned int T = divPrices.n_cols;
+unsigned int U = divPrices.n_rows;
 
 arma::vec tVecPricing(U*T,1);
-for(int uu = 0; uu < U; uu++){
-  for(int tt = 0; tt < T; tt++){
+for(unsigned int uu = 0; uu < U; uu++){
+  for(unsigned int tt = 0; tt < T; tt++){
     tVecPricing(uu + tt*U) = tVec(tt);
   }
 }
 
 arma::mat yhat(1+U*T*3,stateMat.n_cols);
 
-arma::mat tempPrices(U*T,1);
-arma::mat tempDivergencePrices(U*T,1);
+arma::mat tempPrices(U*T,1,arma::fill::zeros);
+arma::mat tempDivergencePrices(U*T,1,arma::fill::zeros);
 for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
   // Write mean returns
   yhat(0,kcol) = stockMeans(kcol);
@@ -120,7 +118,8 @@ arma::vec cVec = Rcpp::as<arma::vec>(modelParameters["cVec"]);
 double spotVol = arma::accu(stateMat.submat(0,0,Nf-1,0));
 obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divModelObsNoiseMat(cVec,bVec,spotVol,tVec,U);
 
-res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obsNoiseMat") = obsNoiseMat);
+// Initialize return list
+Rcpp::List res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obsNoiseMat") = obsNoiseMat);
 
 return res;
 }
