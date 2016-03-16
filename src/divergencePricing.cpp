@@ -5,7 +5,7 @@ using namespace Rcpp;
 
 //' @export
 // [[Rcpp::export]]
-arma::cube divergenceSwapRateCpp(const arma::vec& p, const arma::cube& coeffs, const arma::mat& stateMat){
+arma::cube divergenceSwapRateCpp(const arma::vec p, const arma::cube coeffs, const arma::mat stateMat){
   
   arma::cube cfVals(p.n_elem, coeffs.n_rows, stateMat.n_rows, arma::fill::zeros);
   arma::cube cfAndDerivVals(p.n_elem, coeffs.n_rows, stateMat.n_rows * 4);
@@ -46,7 +46,7 @@ arma::cube divergenceSwapRateCpp(const arma::vec& p, const arma::cube& coeffs, c
 
 //' @export
 // [[Rcpp::export]]
-arma::cube skewnessSwapRateCpp(const arma::vec& p, const arma::cube& coeffs, const arma::mat& stateMat){
+arma::cube skewnessSwapRateCpp(const arma::vec p, const arma::cube coeffs, const arma::mat stateMat){
   
   arma::cube cfVals(p.n_elem, coeffs.n_rows, stateMat.n_rows, arma::fill::zeros);
   arma::cube cfAndDerivVals(p.n_elem, coeffs.n_rows, stateMat.n_rows * 4);
@@ -97,7 +97,7 @@ arma::cube skewnessSwapRateCpp(const arma::vec& p, const arma::cube& coeffs, con
 
 //' @export
 // [[Rcpp::export]]
-arma::cube quarticitySwapRateCpp(const arma::vec& p, const arma::cube& coeffs, const arma::mat& stateMat){
+arma::cube quarticitySwapRateCpp(const arma::vec p, const arma::cube coeffs, const arma::mat stateMat){
   
   arma::cube cfVals(p.n_elem, coeffs.n_rows, stateMat.n_rows, arma::fill::zeros);
   arma::cube cfAndDerivVals(p.n_elem, coeffs.n_rows, stateMat.n_rows * 4);

@@ -7,6 +7,6 @@
 // U is the number of portfolio returns (so meanList is length U+1)
 // currVol is the current state of the volatility factor
 
-arma::vec meanVecFun(Rcpp::List meanListS, const arma::vec& currVol);
+arma::vec meanVecFun(Rcpp::List meanListS, const arma::vec currVol);
 
 #endif

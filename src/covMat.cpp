@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 //' @export
 // [[Rcpp::export]] 
-arma::mat covMatFun(List covListS, const arma::vec covListDim, const arma::vec& currVol) {
+arma::mat covMatFun(List covListS, const arma::vec covListDim, const arma::vec currVol) {
   try{
       List temp;
       // get the output covariance dimension

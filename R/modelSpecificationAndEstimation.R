@@ -6,12 +6,12 @@
 #' @param model.spec \code{list} with fields \code{params.P}, \code{params.Q}, \code{jump.type}, \code{dt}, \code{N.factors}, \code{error}, \code{mkt}
 #' @param for.estimation \code{logical}; determines return type (log-lik) or filtering result
 #' @param filterFoo \code{function} that handles the filtering, must correspond to model specification and to provided observables.
-#' @param par.df \code{data.frame} with columns \code{par.name} with format \code{P$1$kpp} and \code{par.value} with values.
+#' @param N.points \code{integer}, number of integration points for double quadrature in moments of the state and stock price.
 #' @return If \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
 #' @details Not much for now
 #' @export
 
-modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter){
+modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5){
   
   # Extract some variables from model specification
   N.factors <- model.spec$N.factors
@@ -42,7 +42,7 @@ modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, 
         dT = time.dt, 
         N.factors = N.factors, 
         jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
-        N.points = 5,
+        N.points = N.points,
         mod.type = 'standard', 
         rtol = 1e-12, 
         atol = 1e-30
