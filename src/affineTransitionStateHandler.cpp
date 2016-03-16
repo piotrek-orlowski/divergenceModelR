@@ -11,8 +11,6 @@ Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelPara
   // We propagate the past and current state. As such, stateMat.n_rows = 2*N.factors
   unsigned int Nf = stateMat.n_rows/2;
   
-  Rcpp::List res;
-  
   Rcpp::List meanList = modelParameters["mean.vec"];
   Rcpp::List covList = modelParameters["cov.array"];
   
@@ -40,7 +38,7 @@ Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelPara
     // meanMat.col(kcol) += stateMat.col(kcol);
   }
   
-  res = Rcpp::List::create(Rcpp::Named("stateVec") = meanMat, Rcpp::Named("procNoiseMat") = covMatAll);
+  Rcpp::List res = Rcpp::List::create(Rcpp::Named("stateVec") = meanMat, Rcpp::Named("procNoiseMat") = covMatAll);
   
   return res;
 }
