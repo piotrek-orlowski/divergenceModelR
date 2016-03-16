@@ -18,7 +18,7 @@ Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelPara
   
   arma::mat meanMat(stateMat);
   
-  for(int kcol = 0; kcol < meanMat.n_cols; kcol++){
+  for(unsigned int kcol = 0; kcol < meanMat.n_cols; kcol++){
     arma::mat locState = stateMat.col(kcol);
     meanMat.submat(0,kcol,Nf-1,kcol) = meanVecFun(meanList, locState.rows(0,Nf-1));
     meanMat.submat(Nf,kcol,2*Nf-1,kcol) = stateMat.submat(0,0,Nf-1,0); // for reasonable increment handling
@@ -35,7 +35,7 @@ Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelPara
   arma::mat covMatAll(2*Nf,2*Nf,arma::fill::zeros);
   covMatAll.submat(0,0,Nf-1,Nf-1) = covMat;
   
-  for(int kcol = 0; kcol < meanMat.n_cols; kcol++){
+  for(unsigned int kcol = 0; kcol < meanMat.n_cols; kcol++){
     meanMat.submat(0,kcol,Nf-1,kcol) += stateMat.submat(0,kcol,Nf-1,kcol);
     // meanMat.col(kcol) += stateMat.col(kcol);
   }

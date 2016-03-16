@@ -15,7 +15,7 @@ arma::mat covMatFun(List covListS, const arma::vec covListDim, const arma::vec c
       int N = covListDim(0);
       int M = covListDim(1);
       
-      arma::mat covMat(N,M);
+      arma::mat covMat(N,M,arma::fill::zeros);
 
       // calculate covariance matrix, which will be used to calculate C and also the residual R
       covMat.zeros();

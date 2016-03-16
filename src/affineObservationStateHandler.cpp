@@ -33,7 +33,7 @@ Rcpp::List stockMeanIndividual = Rcpp::List::create(stockParamsMeanVec[0]);
 arma::vec stockMeans(stateMat.n_cols);
 
 // Calculate expected stock returns at previous state
-for(int kcol = 0; kcol < stateMat.n_cols; kcol++){
+for(unsigned int kcol = 0; kcol < stateMat.n_cols; kcol++){
   stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.submat(Nf,kcol,2*Nf-1,kcol)));
   // stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.col(kcol)));
 }
@@ -78,7 +78,7 @@ arma::mat yhat(1+U*T*3,stateMat.n_cols);
 
 arma::mat tempPrices(U*T,1);
 arma::mat tempDivergencePrices(U*T,1);
-for(int kcol=0; kcol < stateMat.n_cols; kcol++){
+for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
   // Write mean returns
   yhat(0,kcol) = stockMeans(kcol);
   yhat(0,kcol) += arma::as_scalar(stockAndVolBeta * (stateMat.submat(0,kcol,Nf-1,kcol) - stateMat.submat(Nf,kcol,2*Nf-1,kcol)));

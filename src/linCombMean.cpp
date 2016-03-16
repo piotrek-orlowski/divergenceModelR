@@ -7,7 +7,7 @@ using namespace arma;
 using namespace std;
 using namespace Rcpp;
  
-double linCombMeancpp(SEXP matList, const arma::vec& volFactor) {
+double linCombMeancpp(SEXP matList, const arma::vec volFactor) {
   try{
     List matListRcpp(matList);
 
@@ -22,7 +22,7 @@ double linCombMeancpp(SEXP matList, const arma::vec& volFactor) {
 
     vec outA = a + b * volFactor;
     
-    for (int ii=0; ii<outA.n_elem;ii++) {
+    for (unsigned int ii=0; ii<outA.n_elem;ii++) {
       outA(ii) = expm1(outA(ii));
     }
     

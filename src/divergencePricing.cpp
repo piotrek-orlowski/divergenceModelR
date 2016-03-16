@@ -14,7 +14,7 @@ arma::cube divergenceSwapRateCpp(const arma::vec p, const arma::cube coeffs, con
   cfVals = affineModelR::affineCFevalCpp(coeffs.slices(0,stateMat.n_cols),stateMat,false);
   cfVals -= arma::ones(arma::size(cfVals));
   // Rescale for p different from 0 and 1
-  for(int pp = 0; pp < p.n_elem ;pp++){
+  for(unsigned int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
     if(ploc!=0.0 && ploc!=1.0){
       cfVals.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= 1.0/(ploc*(ploc-1.0));
@@ -61,7 +61,7 @@ arma::cube skewnessSwapRateCpp(const arma::vec p, const arma::cube coeffs, const
   arma::cube cfFirstDeriv = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(stateMat.n_rows, 2*stateMat.n_rows-1));
   
   // Rescale for p different from 0 and 1
-  for(int pp = 0; pp < p.n_elem ;pp++){
+  for(unsigned int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
     if(ploc!=0.0 && ploc!=1.0){
       cfVals.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= -(2*ploc-1)/(pow(ploc,2.0)*pow(ploc-1.0,2.0)); // -(2*p0-1)/(p0^2*(p0-1)^2)
@@ -113,7 +113,7 @@ arma::cube quarticitySwapRateCpp(const arma::vec p, const arma::cube coeffs, con
   arma::cube cfSecondDeriv = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(2*stateMat.n_rows, 3*stateMat.n_rows-1));
   
   // Rescale for p different from 0 and 1
-  for(int pp = 0; pp < p.n_elem ;pp++){
+  for(unsigned int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
     if(ploc!=0.0 && ploc!=1.0){
       cfVals.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= (2-6*ploc+6*pow(ploc,2.0))/(pow(ploc,3.0)*pow(ploc-1.0,3.0)); // (2-6*p0+6*p0^2)/(p0^3*(p0-1)^3)
