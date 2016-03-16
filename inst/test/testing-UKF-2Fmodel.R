@@ -70,66 +70,70 @@ data.structure <- list(obs.data = obsData, spec.mat = expand.grid(t = mkt.spec$t
 
 model.spec <- list(params.P = parList$P, params.Q = parList$Q, jump.type = 'kouExpJumpTransform', dt = 5/252, N.factors  = 2, error = list(cVec=rep(0,3), bVec = c(0.001,0.0020,0.0030)), mkt = mkt.spec)
 
-lik.test <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter)
+lik.test <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter, N.points = 2)
 
 model.spec.wrong <- list(params.P = parList.wrong$P, params.Q = parList.wrong$Q, jump.type = 'kouExpJumpTransform', dt = 5/252, N.factors  = 2, error = list(cVec=rep(0,3), bVec = c(0.001,0.0020,0.0030)), mkt = mkt.spec)
 
-lik.test.wrong <- modelLikelihood(data.structure = data.structure, model.spec = model.spec.wrong, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter)
+lik.test.wrong <- modelLikelihood(data.structure = data.structure, model.spec = model.spec.wrong, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter, N.points = 2)
+
+# ---- PARALLEL TEST ----
+library(parallel)
+cl <- makeCluster(2)
+clusterEvalQ(cl, library(divergenceModelR))
+clusterExport(cl, c("data.structure"))
+# clusterEvalQ(cl,zz <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter))
+
+spec.list <- list(model.spec, model.spec.wrong)
+res <- parLapply(cl = cl, X = spec.list, fun = function(mm){tryCatch(modelLikelihood(data.structure = data.structure, model.spec = mm, for.estimation = T, filterFoo = divergenceModelR:::DSQ_sqrtFilter, N.points = 2),error=function(e){return("Error!")})})
 
 
-# lik.test.simpleFilter <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_filter)
+# ---- HANDLERS TEST ----
+ode.solutions <- Re(odeExtSolveWrap(u = matrix(c(0.1,0,0,0.5,0,0),nrow=2, ncol=3,byrow=T), params.Q = parList$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform'), N.factors = 2, mod.type = 'standard', rtol = 1e-12, atol = 1e-28))
 
-# ---- NOT RUN ----
+model.dynamics <- modelDynamics(params.P = parList$P, params.Q = parList$Q, dT = 5/252,N.factors = 2, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.points = 2, mod.type = 'standard', rtol = 1e-12, atol = 1e-30)
 
-# parList$P$jmp$muSc <- 1/parList$P$jmp$muSc
-# parList$Q$jmp$muSc <- 1/parList$Q$jmp$muSc
+obsParameters <- list(stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(3) ,diag = T)]), cfCoeffs = ode.solutions, tVec = mkt.spec$t, pVec = c(0,0.5), cVec = rep(0,3), bVec = c(0.001,0.0020,0.0030))
 
-# aa <- modelDynamics(params.P = parList$P, params.Q = parList$Q, dT = 5/252, N.factors = 2, jumpTransform = getPointerToJumpTransform('expNormJumpTransform')$TF, N.points = 2, mod.type = 'standard', rtol = 1e-12, atol = 1e-30)
+stobs.list <- lapply(1:1000, function(dd) {affineObservationStateHandler(stateMat = t(lik.test$estimState), modelParameters = obsParameters)})
+idd <- logical(length(stobs.list)-1)
+for(kk in 2:length(stobs.list)){
+  idd[kk-1] <- identical(stobs.list[1],stobs.list[kk])
+}
 
-aa <- modelDynamics(params.P = parList.wrong$P, params.Q = parList.wrong$Q, dT = 5/252,N.factors = 2, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.points = 4, mod.type = 'standard', rtol = 1e-12, atol = 1e-30)
+stobs.good <- stobs.list[[1]]
+stobs.bad <- stobs.list[[242]]
 
-state <- matrix(c(0.0097,2.1983),1)
+dvrgc.list <- lapply(1:30000, function(dd) {quarticitySwapRateCpp(p = c(0.1,0.5), coeffs = ode.solutions, stateMat = lik.test$estimState[,1:2])})
+idd <- logical(length(dvrgc.list)-1)
+for(kk in 2:length(dvrgc.list)){
+  idd[kk-1] <- identical(dvrgc.list[1],dvrgc.list[kk])
+}
 
-testMean <- meanVecFun(meanListS = aa$mean.vec, currVol = state)
-testCovL <- covMatFun(covListS = aa$cov.list, covListDim = c(3,3) ,  currVol = state)
-testCovAO <- affineOption::covMatFun(covListS = aa$cov.array[lower.tri(diag(3),diag=T)], U = 0, currVol = state)
-testCov <- covMatFun(covListS = aa$cov.array[lower.tri(diag(3),diag=T)], covListDim = c(3,3) ,  currVol = state)
+dvrgc.list <- lapply(1:30000, function(dd) {affineCFderivsEvalCpp(coeffs = ode.solutions, stateMat = lik.test$estimState[,1:2])})
+idd <- logical(length(dvrgc.list)-1)
+for(kk in 2:length(dvrgc.list)){
+  idd[kk-1] <- identical(dvrgc.list[1],dvrgc.list[kk])
+}
 
-testCov <- testCov - testMean %*% t(testMean)
-testBeta <- solve(testCov[-1,-1]) %*% testCov[1,-1]
-stockCov <- testCov[1,1] - t(testBeta) %*% testCov[-1,-1] %*% (testBeta)
+idd <- logical(length(dvrgc.list)-1)
+for(kk in 2:length(dvrgc.list)){
+  idd[kk-1] <- identical(dvrgc.list[[1]][,,1:800],dvrgc.list[[kk]][,,1:800])
+}
 
-library(numDeriv)
+idd <- logical(length(dvrgc.list)-1)
+for(kk in 2:length(dvrgc.list)){
+  idd[kk-1] <- identical(dvrgc.list[[1]][,,801:1600],dvrgc.list[[kk]][,,801:1600])
+}
 
-numMean <- grad(func = function(uu){
-  affineCF(u = matrix(c(uu[1],uu[2],uu[3]),nrow=1,ncol=3,byrow=T), params.Q = parList$Q, params.P = parList$P, t.vec = 5/252, v.0 = state, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, CGF = F)
-}, x = c(0,0,0), method = "complex")
-numCov <- hessian(func = function(uu){
-  affineCF(u = matrix(c(uu[1],uu[2],uu[3]),nrow=1,ncol=3,byrow=T), params.Q = parList$Q, params.P = parList$P, t.vec = 5/252, v.0 = state, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, CGF = F, rtol = 1e-8)
-},x = c(0,0,0), method = "complex", method.args = list(r=4, show.details=T))
+idd <- logical(length(dvrgc.list)-1)
+for(kk in 2:length(dvrgc.list)){
+  idd[kk-1] <- identical(dvrgc.list[[1]][,,1:800],dvrgc.list[[kk]][,,1:800])
+}
 
-numCovMat0 <- numCov - numMean %*% t(numMean)
-eigen(numCovMat)$values
+cf.solutions <- Re(jumpDiffusionODEs(u = matrix(c(0.1,0,0,0.5,0,0),nrow=2, ncol=3,byrow=T), params = parList$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, mod.type = 'standard', rtol = 1e-12, atol = 1e-28))
 
-
-numMean <- grad(func = function(uu){
-  affineCF(u = matrix(c(uu[1],uu[2],uu[3]),nrow=1,ncol=3,byrow=T), params.Q = parList$Q, params.P = parList$P, t.vec = 5/252, v.0 = state, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, CGF = F, rtol = 1e-11, atol = 1e-30)
-}, x = c(0,0,0), method = "complex")
-numCov <- hessian(func = function(uu){
-  affineCF(u = matrix(c(uu[1],uu[2],uu[3]),nrow=1,ncol=3,byrow=T), params.Q = parList$Q, params.P = parList$P, t.vec = 5/252, v.0 = state, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, CGF = F, rtol = 1e-11, atol = 1e-30)
-},x = c(0,0,0), method = "complex", method.args = list(r=4,show.details=F))
-
-
-
-numCovMat <- numCov - numMean %*% t(numMean)
-eigen(numCovMat)$values
-
-numMean <- grad(func = function(uu){
-  affineCF(u = matrix(c(uu[1],uu[2],uu[3]),nrow=1,ncol=3,byrow=T), params.Q = parList$Q, params.P = parList$P, t.vec = 5/252, v.0 = state, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, CGF = F)
-}, x = c(0,0,0), method = "Richardson")
-numCov <- hessian(func = function(uu){
-  affineCF(u = matrix(c(uu[1],uu[2],uu[3]),nrow=1,ncol=3,byrow=T), params.Q = parList$Q, params.P = parList$P, t.vec = 5/252, v.0 = state, jumpTransform = getPointerToJumpTransform('kouExpJumpTransform')$TF, N.factors = 2, CGF = F, rtol=1e-6)
-},x = c(0,0,0), method = "Richardson", method.args = list(r=4,show.details=T))
-
-numCovMatR <- numCov - numMean %*% t(numMean)
-eigen(numCovMat)$values
+dvrgc.list <- lapply(1:50000, function(dd) {affineCFevalCpp(coeffs = cf.solutions, stateMat = lik.test$estimState[,1:2], retLog = F)})
+idd <- logical(length(dvrgc.list)-1)
+for(kk in 2:length(dvrgc.list)){
+  idd[kk-1] <- identical(dvrgc.list[1],dvrgc.list[kk])
+}

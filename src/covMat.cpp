@@ -7,25 +7,25 @@ using namespace Rcpp;
 
 //' @export
 // [[Rcpp::export]] 
-arma::mat covMatFun(List covListS, const arma::vec covListDim, const arma::vec& currVol) {
+arma::mat covMatFun(List covListS, const arma::uvec covListDim, const arma::vec currVol) {
   try{
       List temp;
       // get the output covariance dimension
       // int N = currVol.n_elem;
-      int N = covListDim(0);
-      int M = covListDim(1);
+      unsigned int N = covListDim(0);
+      unsigned int M = covListDim(1);
       
-      arma::mat covMat(N,M);
+      arma::mat covMat(N,M,arma::fill::zeros);
 
       // calculate covariance matrix, which will be used to calculate C and also the residual R
       covMat.zeros();
       // calculate predicted return innovation matrix
-      int uInd = 0;
+      unsigned int uInd = 0;
       
       List covList(covListS);
 
-      for (int uu1 = 0; uu1<M; uu1++) {
-        for (int uu2 =uu1; uu2<N; uu2++) {
+      for (unsigned int uu1 = 0; uu1<M; uu1++) {
+        for (unsigned int uu2 =uu1; uu2<N; uu2++) {
             temp = covList[uInd];
             covMat(uu2,uu1) = linCombMeancpp(temp,currVol);
             uInd++;

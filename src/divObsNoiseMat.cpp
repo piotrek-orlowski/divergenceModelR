@@ -5,7 +5,7 @@ using namespace Rcpp;
 
 //' @export
 // [[Rcpp::export]]
-arma::mat divModelObsNoiseMat(const arma::vec& corrs, arma::vec& bpars, double spotVar, const arma::vec& matVec, const int U){
+arma::mat divModelObsNoiseMat(const arma::vec corrs, arma::vec bpars, double spotVar, const arma::vec matVec, const int U){
   
   // Initialize return matrix
   arma::mat res(3*U*matVec.n_elem,3*U*matVec.n_elem);

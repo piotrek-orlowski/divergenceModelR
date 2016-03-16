@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 //' @export
 // [[Rcpp::export]]
-arma::vec meanVecFun(List meanListS, const arma::vec& currVol) {
+arma::vec meanVecFun(List meanListS, const arma::vec currVol) {
   try{
       List temp;
      

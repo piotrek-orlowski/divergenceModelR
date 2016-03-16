@@ -3,6 +3,6 @@
 
 #include "RcppArmadillo.h"
 
-arma::mat covMatFun(Rcpp::List covListS, const arma::vec, const arma::vec& currVol);
+arma::mat covMatFun(Rcpp::List covListS, const arma::uvec covDim, const arma::vec currVol);
 
 #endif
