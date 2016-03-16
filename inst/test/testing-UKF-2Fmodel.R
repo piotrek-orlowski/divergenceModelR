@@ -21,7 +21,7 @@ parList$Q$jmp[c("muYc","sigmaYc","muSc")] <- c(-4e-4,4e-3,1/0.00035)
 parList.wrong <- parList
 parList.wrong$P$`1` <- list(eta=1,lmb=1,kpp=1,rho=-0.9,phi=0.2,erp=0)
 parList.wrong$Q$`1` <- list(eta=1,lmb=1,kpp=1,rho=-0.9,phi=0.2,erp=0)
-parList.wrong$P$jmp$sigmaYc <- 5e-3
+parList.wrong$Q$jmp$muYc <- 0
 
 # ---- SIMULATE DATA ----
 set.seed(123555)
@@ -78,7 +78,7 @@ lik.test.wrong <- modelLikelihood(data.structure = data.structure, model.spec = 
 
 # ---- PARALLEL TEST ----
 library(parallel)
-cl <- makeCluster(3)
+cl <- makeCluster(2)
 clusterEvalQ(cl, library(divergenceModelR))
 clusterExport(cl, c("data.structure"))
 # clusterEvalQ(cl,zz <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter))

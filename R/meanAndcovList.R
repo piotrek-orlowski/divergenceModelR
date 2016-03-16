@@ -17,18 +17,9 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
   # first calculate mean propagation lists
   stock.struct <- condStockChange(ret.period=dT)
   mean.lists <- list(momentCondition(params.P,params.Q,jumpTransform = jumpTransform,condition.struct=stock.struct,conditional=TRUE,rtol=rtol,...))
-  
-  u.t.mat <- matrix(c(u=0,t=1),nrow=1)
-  U <- 1
-  
+
   # create function list. First is stock, then U portfolios and then the vol factors
   list.fun <- list(function(x) condStockChange(ret.period=hedge.freq, ret.start = x,N.factors=N.factors))
-  
-  for (uu in 1:U) {
-    list.fun <- append(list.fun,values=function(x) condGeneratePortfolio(u.vec=u.t.mat[uu,1],tau.js=x,deltas=hedge.freq,ttm=u.t.mat[uu,2], N.factors=N.factors))
-    environment(list.fun[[length(list.fun)]]) <- new.env()
-    assign("uu",uu,environment(list.fun[[length(list.fun)]]))
-  }
   
   # now add vol factors
   for (vv in 1:N.factors) {
@@ -42,10 +33,10 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
   quad.2d <- createSparseGrid(type="KPU",dimension=2,k=N.points)
   
   # initialize lists that will hold the structures
-  mean.vec <- array(list(),c(1+U+N.factors))
+  mean.vec <- array(list(),c(1+N.factors))
   
   # we need to seperately do the 2d (autocovariance terms) and 1d quad (variance terms)
-  cov.array <- array(list(),c(rep(1+U+N.factors,2)))
+  cov.array <- array(list(),c(rep(1+N.factors,2)))
   
   # calculate mean list
   for (nn in 1:length(list.fun)) {
@@ -89,5 +80,5 @@ modelDynamics <- function(params.P, params.Q, dT=5/252, rtol=1e-14, N.factors = 
     }
   }
   
-  return(list(mean.vec = mean.vec[-2], cov.array = cov.array[-2,-2], cov.list = cov.array[-2,-2][lower.tri(diag(N.factors+1),diag=TRUE)]))
+  return(list(mean.vec = mean.vec, cov.array = cov.array, cov.list = cov.array[lower.tri(diag(N.factors+1),diag=TRUE)]))
 }
