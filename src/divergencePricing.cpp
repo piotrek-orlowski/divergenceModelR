@@ -1,6 +1,6 @@
 #include <RcppArmadillo.h>
-//#include "affineCF.h"
-#include "affineModelR_RcppExports.h"
+#include "affineCF.h"
+// #include "affineModelR_RcppExports.h"
 using namespace Rcpp;
 
 //' @export
@@ -11,7 +11,7 @@ arma::cube divergenceSwapRateCpp(const arma::vec p, const arma::cube coeffs, con
   arma::cube cfAndDerivVals(p.n_elem, coeffs.n_rows, stateMat.n_rows * 4, arma::fill::zeros);
   
   // First calculate CF values and less 1
-  cfVals = affineModelR::affineCFevalCpp(coeffs.slices(0,stateMat.n_cols),stateMat,false);
+  cfVals = affineCFevalCpp(coeffs.slices(0,stateMat.n_cols),stateMat,false);
   cfVals -= arma::ones(arma::size(cfVals));
   // Rescale for p different from 0 and 1
   for(unsigned int pp = 0; pp < p.n_elem ;pp++){
@@ -29,7 +29,7 @@ arma::cube divergenceSwapRateCpp(const arma::vec p, const arma::cube coeffs, con
     arma::uvec whichZero = find(p == pZeros);
     arma::uvec whichOne = find(p == pOnes);
     // calculate derivatives
-    cfAndDerivVals = affineModelR::affineCFderivsEvalCpp(coeffs,stateMat);
+    cfAndDerivVals = affineCFderivsEvalCpp(coeffs,stateMat);
     // assign in zeros
     if(whichZero.n_elem > 0){
       arma::cube tempCube = -cfAndDerivVals.subcube(arma::span(whichZero(0),whichZero(0)), arma::span::all, arma::span(stateMat.n_rows,2*stateMat.n_rows-1));
@@ -53,7 +53,7 @@ arma::cube skewnessSwapRateCpp(const arma::vec p, const arma::cube coeffs, const
   arma::cube swapRates(p.n_elem, coeffs.n_rows, stateMat.n_rows, arma::fill::zeros);
   
   // First calculate CF values and less 1
-  cfAndDerivVals = affineModelR::affineCFderivsEvalCpp(coeffs,stateMat);
+  cfAndDerivVals = affineCFderivsEvalCpp(coeffs,stateMat);
   cfVals = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(0,stateMat.n_rows-1));
   cfVals -= arma::ones(arma::size(cfVals));
   
@@ -104,7 +104,7 @@ arma::cube quarticitySwapRateCpp(const arma::vec p, const arma::cube coeffs, con
   arma::cube swapRates(p.n_elem, coeffs.n_rows, stateMat.n_rows, arma::fill::zeros);
   
   // First calculate CF values and less 1
-  cfAndDerivVals = affineModelR::affineCFderivsEvalCpp(coeffs,stateMat);
+  cfAndDerivVals = affineCFderivsEvalCpp(coeffs,stateMat);
   cfVals = cfAndDerivVals(arma::span::all, arma::span::all, arma::span(0,stateMat.n_rows-1));
   cfVals -= arma::ones(arma::size(cfVals));
   
