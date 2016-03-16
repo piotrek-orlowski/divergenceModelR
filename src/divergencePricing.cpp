@@ -16,7 +16,7 @@ arma::cube divergenceSwapRateCpp(const arma::vec p, const arma::cube coeffs, con
   // Rescale for p different from 0 and 1
   for(int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
-    if(ploc!=0.0 & ploc!=1.0){
+    if(ploc!=0.0 && ploc!=1.0){
       cfVals.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= 1.0/(ploc*(ploc-1.0));
     }
   }
@@ -63,7 +63,7 @@ arma::cube skewnessSwapRateCpp(const arma::vec p, const arma::cube coeffs, const
   // Rescale for p different from 0 and 1
   for(int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
-    if(ploc!=0.0 & ploc!=1.0){
+    if(ploc!=0.0 && ploc!=1.0){
       cfVals.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= -(2*ploc-1)/(pow(ploc,2.0)*pow(ploc-1.0,2.0)); // -(2*p0-1)/(p0^2*(p0-1)^2)
       cfFirstDeriv.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= 1.0/(ploc*(ploc-1.0));
     }
@@ -115,7 +115,7 @@ arma::cube quarticitySwapRateCpp(const arma::vec p, const arma::cube coeffs, con
   // Rescale for p different from 0 and 1
   for(int pp = 0; pp < p.n_elem ;pp++){
     double ploc = p(pp);
-    if(ploc!=0.0 & ploc!=1.0){
+    if(ploc!=0.0 && ploc!=1.0){
       cfVals.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= (2-6*ploc+6*pow(ploc,2.0))/(pow(ploc,3.0)*pow(ploc-1.0,3.0)); // (2-6*p0+6*p0^2)/(p0^3*(p0-1)^3)
       cfFirstDeriv.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= (-2*ploc + 6*pow(ploc,2.0) - 4*pow(ploc,3.0))/(pow(ploc,3.0)*pow(ploc-1.0,3.0)); //(-2*p0+6*p0^2-4*p0^3)/(p0^3*(p0-1)^3)
       cfSecondDeriv.subcube(arma::span(pp,pp), arma::span::all, arma::span::all) *= (pow(ploc,2.0)-2*pow(ploc,3.0)+pow(ploc,4.0))/(pow(ploc,3.0)*pow(ploc-1.0,3.0)); //(p0^2-2*p0^3+p0^4)/(p0^3*(p0-1)^3)
