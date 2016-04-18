@@ -12,15 +12,15 @@ testCov <- covMatFun(covListS = aa$cov.array[c(1,2,4)], covListDim = c(2,2) ,  c
 
 calc.par <- list(mean.vec = aa$mean.vec[-1], cov.array = aa$cov.array[2,2])
 
-meancov <- affineTransitionStateHandler(stateMat = rbind(c(0.5,1,2),c(0,0,0)), modelParameters = calc.par)
+meancov <- affineTransitionStateHandler(stateMat = rbind(c(0.5,1,2),c(0,0,0)), modelParameters = calc.par,1)
 
 #### ---- OBSERVATION ----
 mkt.spec <- data.frame(p=1,q=0,r=0,t=c(0.5))
-sol.check.derivs <- Re(odeExtSolveWrap(u = cbind(0.5,0), params.P = parListHestonLev$P, params.Q = parListHestonLev$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('expNormJumpTransform'), N.factors = 1, mod.type = 'standard', rtol = 1e-12, atol = 1e-22))
+sol.check.derivs <- Re(odeExtSolveWrap(u = rbind(cbind(0.5,0),cbind(0,0)), params.P = parListHestonLev$P, params.Q = parListHestonLev$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('expNormJumpTransform'), N.factors = 1, mod.type = 'standard', rtol = 1e-12, atol = 1e-22))
 
-obsParameters <- list(stockParams = list(mean.vec = aa$mean.vec, cov.array = aa$cov.array[lower.tri(diag(2) ,diag = T)]), cfCoeffs = sol.check.derivs, tVec = mkt.spec$t, pVec = 0.5, cVec = rep(0.8,3), bVec = rep(0.05,3))
+obsParameters <- list(stockParams = list(mean.vec = aa$mean.vec, cov.array = aa$cov.array[lower.tri(diag(2) ,diag = T)]), cfCoeffs = sol.check.derivs, tVec = mkt.spec$t, pVec = c(0.5,0), cVec = rep(0.8,3), bVec = rep(0.05,3), divNoiseCube = array(1,dim=c(6,6,1)))
 
-stobs <- affineObservationStateHandler(stateMat = rbind(c(0.98,1,1.1),c(1,1,1)), modelParameters = obsParameters)
+stobs <- affineObservationStateHandler(stateMat = rbind(c(0.98,1,1.1),c(1,1,1)), modelParameters = obsParameters, iterCount = 0)
 
 #### ---- TEST WHOLE FILTER ----
 load("D:/git/hfAffine/RpackageDev/affineOption/data/heston.params.RData")

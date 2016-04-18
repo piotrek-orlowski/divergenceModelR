@@ -9,7 +9,7 @@ using namespace std;
 
 //' @export
 // [[Rcpp::export]]
-Rcpp::List affineObservationStateHandler(arma::mat stateMat, Rcpp::List modelParameters){
+Rcpp::List affineObservationStateHandler(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount){
 
 // In state mat, additionally, to state values, we carry the past filtered state
 // because it is necessary to calculate effects of stock return observation
@@ -86,6 +86,7 @@ for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
   tempPrices.reshape(U*T,1);
   // save divergence prices for standardising skewness and kurtosis
   tempDivergencePrices = tempPrices;
+  // annualise divergence prices
   yhat(arma::span(1,U*T),kcol) = tempPrices % arma::pow(tVecPricing,-1.0);
 
     // Write skewness prices
@@ -110,13 +111,16 @@ for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
 // uncorrelated with portfolio observation noise.
 arma::mat obsNoiseMat(1+3*U*T,1+3*U*T,arma::fill::zeros);
 obsNoiseMat(0,0) = stockNoise(0,0);
-
-// extract observation noise params
-arma::vec bVec = Rcpp::as<arma::vec>(modelParameters["bVec"]);
-arma::vec cVec = Rcpp::as<arma::vec>(modelParameters["cVec"]);
-// double spotVol = arma::accu(stateMat.col(0));
-double spotVol = arma::accu(stateMat.submat(0,0,Nf-1,0));
-obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divModelObsNoiseMat(cVec,bVec,spotVol,tVec,U);
+// 
+// // extract observation noise params
+// arma::vec bVec = Rcpp::as<arma::vec>(modelParameters["bVec"]);
+// arma::vec cVec = Rcpp::as<arma::vec>(modelParameters["cVec"]);
+// // double spotVol = arma::accu(stateMat.col(0));
+// double spotVol = arma::accu(stateMat.submat(0,0,Nf-1,0));
+// obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divModelObsNoiseMat(cVec,bVec,spotVol,tVec,U);
+SEXP divBigMat_SEXP(modelParameters["divNoiseCube"]);
+arma::cube divBigMat = as<arma::cube>(divBigMat_SEXP);
+obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divBigMat.slice(iterCount);
 
 // Initialize return list
 Rcpp::List res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obsNoiseMat") = obsNoiseMat);

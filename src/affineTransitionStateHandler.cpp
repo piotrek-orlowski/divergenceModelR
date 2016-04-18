@@ -7,7 +7,7 @@ using namespace std;
 
 //' @export
 // [[Rcpp::export]]
-Rcpp::List affineTransitionStateHandler(arma::mat stateMat, Rcpp::List modelParameters){
+Rcpp::List affineTransitionStateHandler(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount){
   // We propagate the past and current state. As such, stateMat.n_rows = 2*N.factors
   unsigned int Nf = stateMat.n_rows/2;
   
