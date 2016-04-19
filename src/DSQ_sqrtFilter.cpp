@@ -8,6 +8,7 @@ using namespace Rcpp;
 //' @name filterCaller
 //' @title C++ filter call
 //' @description This function wraps the ukfClass construction and exposes the call to R. Should not be used directly by the user, rather its exported R interface should be given as an argument to \code{\link{modelLikelihood}}
+//' @export
 //[[Rcpp::export]]
 List DSQ_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams){
   
