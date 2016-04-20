@@ -1,25 +1,24 @@
 #' @title Affine model likelihood based on divergence prices
 #' @name modLik
-#' @description Based on a specification object, this function evaluates the log-likelihood of the filtering result
+#' @description Functions for preparing model specification, evaluating the likelihood for the DSQ filtering.
 #' @param data.structure \code{list} with fields \code{spec.mat}, \code{obs.data}, \code{noise.cov.cube}
 #' @param model.spec \code{list} with fields \code{params.P}, \code{params.Q}, \code{jump.type}, \code{dt}, \code{N.factors}, \code{error}, \code{mkt}
 #' @param for.estimation \code{logical}; determines return type (log-lik) or filtering result
 #' @param filterFoo \code{function} that handles the filtering, must correspond to model specification and to provided observables.
 #' @param N.points \code{integer}, number of integration points for double quadrature in moments of the state and stock price.
-#' @return If \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
+#' @return \code{model_Likelihood} if \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
 #' @details Not much for now
 #' @export
 
-modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5){
+model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5){
   
   # Extract some variables from model specification
   N.factors <- model.spec$N.factors
   params.P <- model.spec$params.P
   params.Q <- model.spec$params.Q
   jump.type <- model.spec$jump.type
-  mkt.spec <- model.spec$mkt
-  error.spec <- model.spec$error
-  time.dt <- model.spec$dt
+  time.dt <- data.structure$dt
+  mkt.spec <- data.structure$mkt
   spec.mat <- data.structure$spec.mat
   data.obs <- data.structure$obs.data
   
@@ -116,6 +115,7 @@ modelLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, 
 #' @param par.names parameter names, character vector equal in length to par
 #' @param par.restr parameter equality restrictions, data.frame; par.vec and par.restr have to exhaust the model parameter set together.
 #' @param N.factors integer, number of SV factors
+#' @return \code{model_translateParameters} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
 #' @export
 model_translateParameters <- function(par.vec, par.names = names(par.vec), par.restr, N.factors){
   
@@ -301,4 +301,23 @@ model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$j
     names <- names[-which.restr]
   }
   return(list(par.names=names, par.restr = par.restr))
+}
+
+#' @describeIn modLik
+#' @return \code{model_wrapLikelihood} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
+#' @export
+
+model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5){
+  
+  retFoo <- function(par.vec){
+    par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
+    model.spec$params.P <- par.list$params.P
+    model.spec$params.Q <- par.list$params.Q
+    
+    logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points)
+    
+    return(logLik)
+  }
+ 
+  return(retFoo)
 }
