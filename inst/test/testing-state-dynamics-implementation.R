@@ -15,10 +15,10 @@ calc.par <- list(mean.vec = aa$mean.vec[-1], cov.array = aa$cov.array[2,2])
 meancov <- affineTransitionStateHandler(stateMat = rbind(c(0.5,1,2),c(0,0,0)), modelParameters = calc.par,1)
 
 #### ---- OBSERVATION ----
-mkt.spec <- data.frame(p=1,q=0,r=0,t=c(0.5))
+mkt.spec <- data.frame(p=1,q=0,r=0,t=c(1/12,0.5))
 sol.check.derivs <- Re(odeExtSolveWrap(u = rbind(cbind(0.5,0),cbind(0,0)), params.P = parListHestonLev$P, params.Q = parListHestonLev$Q, mkt = mkt.spec, jumpTransform = getPointerToJumpTransform('expNormJumpTransform'), N.factors = 1, mod.type = 'standard', rtol = 1e-12, atol = 1e-22))
 
-obsParameters <- list(stockParams = list(mean.vec = aa$mean.vec, cov.array = aa$cov.array[lower.tri(diag(2) ,diag = T)]), cfCoeffs = sol.check.derivs, tVec = mkt.spec$t, pVec = c(0.5,0), cVec = rep(0.8,3), bVec = rep(0.05,3), divNoiseCube = array(1,dim=c(6,6,1)))
+obsParameters <- list(stockParams = list(mean.vec = aa$mean.vec, cov.array = aa$cov.array[lower.tri(diag(2) ,diag = T)]), cfCoeffs = sol.check.derivs, tVec = mkt.spec$t, pVec = c(0.5,0), cVec = rep(0.8,3), bVec = rep(0.05,3), divNoiseCube = array(1,dim=c(12,12,1)))
 
 stobs <- affineObservationStateHandler(stateMat = rbind(c(0.98,1,1.1),c(1,1,1)), modelParameters = obsParameters, iterCount = 0)
 
@@ -91,3 +91,42 @@ model.spec <- list(params.P = parListHestonLev$P, params.Q = parListHestonLev$Q,
 # meancov <- affineTransitionStateHandler(stateMat = rbind(c(0.5,1,2),c(0,0,0)), modelParameters = calc.par)
 
 lik.test.notest <- modelLikelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = F, filterFoo = divergenceModelR:::DSQ_sqrtFilter)
+
+
+### callers tests ----
+load("D:/git/hfAffine/RpackageDev/affineOption/data/heston.params.RData")
+parListHestonLev$Q$`1`$phi <- parListHestonLev$P$`1`$phi <- 0.3
+parListHestonLev$Q$`1`$lmb <- parListHestonLev$P$`1`$lmb <- 1.2
+parListHestonLev$P$jmp$lvec <- parListHestonLev$Q$jmp$lvec <- 1
+parListHestonLev$P$jmp$lprop <- parListHestonLev$Q$jmp$lprop <- 1
+parListHestonLev$P$jmp$muYc <- -0.03
+parListHestonLev$Q$jmp$muYc <- -0.05
+parListHestonLev$P$jmp$sigmaYc <- 0.05
+parListHestonLev$Q$jmp$sigmaYc <- 0.05
+parListHestonLev$P$jmp$muSc <- 1/0.15
+parListHestonLev$Q$jmp$muSc <- 1/0.20
+
+nm.list <- spec_1FtoyModel()$par.names
+par.unlist <- unlist(parListHestonLev)
+names(par.unlist) <- gsub(pattern = "\\.",replacement = "$", names(par.unlist))
+names(par.unlist) <- gsub(pattern = "lprop",replacement = "lprop.1", names(par.unlist))
+par.vec <- par.unlist[nm.list]
+par.vec.2 <- par.vec
+par.vec.2["P$1$erp"] <- 0.5
+modLik <- model_wrapLikelihood(data.structure = specData_DSQ_1M_6M_0115("D:/git/lugtex/swapRateModel/optData/"), model.spec = spec_1FtoyModel(), for.estimation = T, filterFoo = DSQ_sqrtFilter, N.points = 3)
+
+system.time(
+  eval.test <- modLik(par.vec = par.vec)
+)
+
+library(parallel)
+cl <- makeCluster(2)
+clusterEvalQ(cl, library(divergenceModelR))
+par.list <- list(par.vec, par.vec.2)
+
+system.time(
+  par.eval.test <- parLapply(cl = cl, X = par.list, fun = modLik)
+)
+
+library(nloptr)
+try.opt <- 

@@ -311,8 +311,8 @@ model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FA
   
   retFoo <- function(par.vec){
     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
-    model.spec$params.P <- par.list$params.P
-    model.spec$params.Q <- par.list$params.Q
+    model.spec$params.P <- par.list$P
+    model.spec$params.Q <- par.list$Q
     
     logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points)
     
