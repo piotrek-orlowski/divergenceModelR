@@ -129,4 +129,3 @@ system.time(
 )
 
 library(nloptr)
-try.opt <- 

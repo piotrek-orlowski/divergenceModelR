@@ -22,6 +22,17 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   spec.mat <- data.structure$spec.mat
   data.obs <- data.structure$obs.data
   
+  # Test parameters for vol factor Feller conditions
+  feller.check <- model_fellerConditionCheck(params.P = params.P, params.Q = params.Q, N.factors = N.factors)
+  if(!any(feller.check$p)){
+    print("P-measure Feller condition not met")
+    return(-1e15)
+  }
+  if(!any(feller.check$q)){
+    print("Q-measure Feller condition not met")
+    return(-1e15)
+  }
+  
   # solve ODEs for pricing
   ode.solutions <- Re(odeExtSolveWrap(
         u = cbind(unique(spec.mat[,"p"]),matrix(0,length(unique(spec.mat[,"p"])),N.factors)), 
@@ -88,7 +99,15 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
     init.state <- matrix(init.state,ncol=1)
   }
   init.state <- 1e5 * (init.state[2,]-init.state[1,])
-  init.state <- matrix(rep(init.state,2), ncol = 1)
+  init.state <- Re(matrix(rep(init.state,2), ncol = 1))
+  
+  # check stationarity under P (approximate)
+  eta.P <- unlist(sapply(params.P,function(x) x$eta))
+  if(any(init.state[1:N.factors]/eta.P >= 5 )){
+    print("Non-stationary P-measure volatility")
+    return(-1e15)
+  }
+  
   init.vol <- matrix(0,2*N.factors,2*N.factors)
   init.vol[1:N.factors,1:N.factors] <- covMatFun(
           covListS = vol.cov.array[lower.tri(x = diag(N.factors),diag = T)], 
@@ -96,11 +115,16 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
           currVol = init.state[1:N.factors,1,drop=F]
         )
   
-  filtering.result <- filterFoo(
+  filtering.result <- tryCatch(filterFoo(
         dataMat = data.obs, 
         initState = init.state, 
         initProcCov = init.vol, 
         modelParams = list(transition = transition.parameters, observation = observation.parameters)
+      ),
+        error = function(e) {
+          print(e)
+          list(logL = -1e15)
+        }
       )
   
   if(for.estimation){
@@ -320,4 +344,25 @@ model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FA
   }
  
   return(retFoo)
+}
+
+#' @describeIn modLik
+#' @return \code{model_fellerConditionCheck} list with two logical vectors reporting whether the Feller conditions are satisfied
+#' @export
+model_fellerConditionCheck <- function(params.P, params.Q, N.factors){
+    
+  p <- logical(N.factors)
+  pval <- numeric(N.factors)
+  for(ff in 1:N.factors){
+    pval[ff] <- 2 * params.P[[as.character(ff)]]$kpp * params.P[[as.character(ff)]]$eta - params.P[[as.character(ff)]]$lmb^2
+    p[ff] <- pval[ff] > 0
+  }
+  
+  q <- logical(N.factors)
+  qval <- numeric(N.factors)
+  for(ff in 1:N.factors){
+    qval[ff] <- 2 * params.Q[[as.character(ff)]]$kpp * params.Q[[as.character(ff)]]$eta - params.Q[[as.character(ff)]]$lmb^2
+    q[ff] <- qval[ff] > 0
+  }
+  return(list(p=p,q=q))
 }
