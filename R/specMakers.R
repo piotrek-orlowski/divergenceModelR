@@ -20,8 +20,8 @@ spec_1FtoyModel <- function(){
 #' @export
 specData_DSQ_1M_6M_0115 <- function(path.to.data){
   
-  load(paste0(path.to.data,"/","divergence-prices-omtr-asymptotic-iv-for-estimation.RData"))
-  load(paste0(path.to.data,"/","SP500_daily.RData"))
+  load(paste0(path.to.data,"divergence-prices-omtr-asymptotic-iv-for-estimation.RData"))
+  load(paste0(path.to.data,"SP500_daily.RData"))
   
   pVec <- 0.5
   tVec <- c(1/12,1/2)
