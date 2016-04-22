@@ -6,11 +6,12 @@
 #' @param for.estimation \code{logical}; determines return type (log-lik) or filtering result
 #' @param filterFoo \code{function} that handles the filtering, must correspond to model specification and to provided observables.
 #' @param N.points \code{integer}, number of integration points for double quadrature in moments of the state and stock price.
+#' @param penalized \code{FALSE} by default, if \code{TRUE}, the Feller constraint is imposed as a penalty on the likelihood. Otherwise, infinity is returned (discontinuous at boundary).
 #' @return \code{model_Likelihood} if \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
 #' @details Not much for now
 #' @export
 
-model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5){
+model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE){
   
   # Extract some variables from model specification
   N.factors <- model.spec$N.factors
@@ -24,13 +25,18 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   
   # Test parameters for vol factor Feller conditions
   feller.check <- model_fellerConditionCheck(params.P = params.P, params.Q = params.Q, N.factors = N.factors)
-  if(!any(feller.check$p)){
-    print("P-measure Feller condition not met")
-    return(-1e15)
-  }
-  if(!any(feller.check$q)){
-    print("Q-measure Feller condition not met")
-    return(-1e15)
+  logl.penalty <- 0
+  if(!penalized){
+    if(!any(feller.check$p)){
+      print("P-measure Feller condition not met")
+      return(-1e15)
+    }
+    if(!any(feller.check$q)){
+      print("Q-measure Feller condition not met")
+      return(-1e15)
+    }
+  } else {
+    logl.penalty <- -1e12 * sum(feller.check$p * pmin(0,feller.check$pval)^2 + feller.check$q * pmin(0, feller.check$qval)^2)
   }
   
   # solve ODEs for pricing
@@ -128,7 +134,7 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       )
   
   if(for.estimation){
-    return(sum(filtering.result$logL))
+    return(sum(filtering.result$logL + logl.penalty))
   } else {
     return(filtering.result)
   }
@@ -331,14 +337,14 @@ model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$j
 #' @return \code{model_wrapLikelihood} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 #' @export
 
-model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5){
+model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE){
   
   retFoo <- function(par.vec){
     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
     model.spec$params.P <- par.list$P
     model.spec$params.Q <- par.list$Q
     
-    logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points)
+    logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized)
     
     return(logLik)
   }
@@ -364,5 +370,5 @@ model_fellerConditionCheck <- function(params.P, params.Q, N.factors){
     qval[ff] <- 2 * params.Q[[as.character(ff)]]$kpp * params.Q[[as.character(ff)]]$eta - params.Q[[as.character(ff)]]$lmb^2
     q[ff] <- qval[ff] > 0
   }
-  return(list(p=p,q=q))
+  return(list(p=p,q=q,pval= pval, qval= qval))
 }
