@@ -11,7 +11,7 @@
 #' @details Not much for now
 #' @export
 
-model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE){
+model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12){
   
   # Extract some variables from model specification
   N.factors <- model.spec$N.factors
@@ -36,7 +36,7 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       return(-1e15)
     }
   } else {
-    logl.penalty <- -1e12 * sum(feller.check$p * pmin(0,feller.check$pval)^2 + feller.check$q * pmin(0, feller.check$qval)^2)
+    logl.penalty <- -penalty * sum(feller.check$p * pmin(0,feller.check$pval)^2 + feller.check$q * pmin(0, feller.check$qval)^2)
   }
   
   # solve ODEs for pricing
@@ -337,14 +337,14 @@ model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$j
 #' @return \code{model_wrapLikelihood} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 #' @export
 
-model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE){
+model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty){
   
   retFoo <- function(par.vec){
     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
     model.spec$params.P <- par.list$P
     model.spec$params.Q <- par.list$Q
     
-    logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized)
+    logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized, penalty = penalty)
     
     return(logLik)
   }
