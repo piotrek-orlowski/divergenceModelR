@@ -79,7 +79,35 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
         pVec = unique(spec.mat[,"p"])
       )
   
-  # Initial state value
+  # Long-term means under Q
+  q.init.state <- matrix(0,nrow = 2, ncol = N.factors)
+  for(kk in 1:N.factors){
+    deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
+    deriv.u[2,kk+1] <- 1e-5
+    init.state.loc <- affineCF(
+      u = deriv.u, 
+      params.Q = params.Q, 
+      params.P = NULL, 
+      t.vec = 10, 
+      v.0 = matrix(1,nrow=1,ncol=N.factors), 
+      jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
+      N.factors = N.factors, 
+      CGF = FALSE, 
+      mod.type = 'standard', 
+      atol = 1e-24, 
+      rtol = 1e-10
+    )
+    q.init.state[,kk] <- drop(init.state.loc)
+  }
+  
+  q.init.state <- drop(q.init.state)
+  if(is.null(dim(q.init.state))){
+    q.init.state <- matrix(q.init.state,ncol=1)
+  }
+  q.init.state <- 1e5 * (q.init.state[2,]-q.init.state[1,])
+  q.init.state <- Re(matrix(rep(q.init.state,2), ncol = 1))
+  
+  # Initial state values -- long-term means under P
   init.state <- matrix(0,nrow = 2, ncol = N.factors)
   for(kk in 1:N.factors){
     deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
@@ -107,12 +135,18 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   init.state <- 1e5 * (init.state[2,]-init.state[1,])
   init.state <- Re(matrix(rep(init.state,2), ncol = 1))
   
-  # check stationarity under P (approximate)
+  # check stationarity under P and Q (approximate)
   eta.P <- unlist(sapply(params.P,function(x) x$eta))
-  if(any(init.state[1:N.factors]/eta.P >= 5 )){
-    print("Non-stationary P-measure volatility")
-    return(-1e15)
-  }
+  eta.Q <- unlist(sapply(params.Q,function(x) x$eta))
+  stat.penalty <- 0
+  stat.penalty <- as.numeric(init.state[1:N.factors]/eta.P >= 10) * pmax(0, init.state[1:N.factors]/eta.P - 10)^2
+  stat.penalty <- c(stat.penalty, as.numeric(q.init.state[1:N.factors]/eta.Q >= 10) * pmax(0, q.init.state[1:N.factors]/eta.Q - 10)^2)
+  stat.penalty <- -penalty * sum(stat.penalty)
+  logl.penalty <- logl.penalty + stat.penalty
+#   if(any(init.state[1:N.factors]/eta.P >= 5 )){
+#     print("Non-stationary P-measure volatility")
+#     return(-1e15)
+#   }
   
   init.vol <- matrix(0,2*N.factors,2*N.factors)
   init.vol[1:N.factors,1:N.factors] <- covMatFun(
