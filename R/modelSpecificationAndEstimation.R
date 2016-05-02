@@ -106,6 +106,7 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   }
   q.init.state <- 1e5 * (q.init.state[2,]-q.init.state[1,])
   q.init.state <- Re(matrix(rep(q.init.state,2), ncol = 1))
+  q.init.state[which(is.infinite(q.init.state))] <- 100.0
   
   # Initial state values -- long-term means under P
   init.state <- matrix(0,nrow = 2, ncol = N.factors)
