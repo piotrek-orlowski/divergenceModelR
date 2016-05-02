@@ -36,7 +36,7 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       return(-1e15)
     }
   } else {
-    logl.penalty <- -penalty * sum(feller.check$p * pmin(0,feller.check$pval)^2 + feller.check$q * pmin(0, feller.check$qval)^2)
+    logl.penalty <- -penalty * sum( sum( as.numeric(!feller.check$p) * pmin(0,feller.check$pval)^2 + as.numeric(!feller.check$q) * pmin(0, feller.check$qval)^2) + !feller.check$q * pmin(0, feller.check$qval)^2)
   }
   
   # solve ODEs for pricing
