@@ -9,6 +9,8 @@ spec_1FtoyModel <- function(){
   
   N.factors <- 1
   model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.", 1:N.factors)))
+  model.spec$par.names <- c(model.spec$par.names[1], as.character(model.spec$par.restr$par.name[1]), model.spec$par.names[-1])
+  model.spec$par.restr <- model.spec$par.restr[-1,]
   model.spec$N.factors <- N.factors
   model.spec$jump.type <- 'kouExpJumpTransform'
   
@@ -64,4 +66,11 @@ specData_DSQ_1M_6M_0115 <- function(path.to.data){
   
   spec.mat <- obs.spec %>% select(-index)
   return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
+}
+
+#' @describeIn modSetup
+#' @details \code{spec_2FatfModel} Specifies a two-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. 
+#' @export
+spec_2FatfModel <- function(){
+  
 }
