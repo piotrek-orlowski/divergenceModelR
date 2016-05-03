@@ -88,13 +88,13 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       u = deriv.u, 
       params.Q = params.Q, 
       params.P = NULL, 
-      t.vec = 10, 
+      t.vec = 2, 
       v.0 = matrix(1,nrow=1,ncol=N.factors), 
       jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
       N.factors = N.factors, 
       CGF = FALSE, 
       mod.type = 'standard', 
-      atol = 1e-24, 
+      atol = 1e-12, 
       rtol = 1e-10
     )
     q.init.state[,kk] <- drop(init.state.loc)
@@ -117,13 +117,13 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       u = deriv.u, 
       params.Q = params.Q, 
       params.P = params.P, 
-      t.vec = 10, 
+      t.vec = 2, 
       v.0 = matrix(1,nrow=1,ncol=N.factors), 
       jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
       N.factors = N.factors, 
       CGF = FALSE, 
       mod.type = 'standard', 
-      atol = 1e-24, 
+      atol = 1e-12, 
       rtol = 1e-10
     )
     init.state[,kk] <- drop(init.state.loc)
