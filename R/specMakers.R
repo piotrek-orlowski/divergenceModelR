@@ -69,8 +69,20 @@ specData_DSQ_1M_6M_0115 <- function(path.to.data){
 }
 
 #' @describeIn modSetup
-#' @details \code{spec_2FatfModel} Specifies a two-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. 
+#' @details \code{spec_3FsepIntModel} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility
 #' @export
-spec_2FatfModel <- function(){
+spec_3FsepIntModel <- function(){
   
+  N.factors <- 3
+  model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.", 1:(N.factors-1)),"Q$jmp$muYc",paste0("Q$",2,"$eta")))
+  model.spec$par.names <- c(model.spec$par.names[1], as.character(model.spec$par.restr$par.name[1]), model.spec$par.names[-1])
+  model.spec$par.restr <- model.spec$par.restr[-1,]
+  model.spec$par.names <- model.spec$par.names[-which(grepl("P.jmp.muYc",model.spec$par.names))]
+  model.spec$par.restr <- rbind(data.frame(par.name = "P$jmp$muYc", par.value = 0),model.spec$par.restr)
+  model.spec$par.names <- model.spec$par.names[-which(grepl("P.3.phi",model.spec$par.names))]
+  model.spec$par.restr <- rbind(data.frame(par.name = "P$3$phi", par.value = 0),model.spec$par.restr)
+  model.spec$N.factors <- N.factors
+  model.spec$jump.type <- 'kouExpJumpTransform'
+  
+  return(model.spec)  
 }

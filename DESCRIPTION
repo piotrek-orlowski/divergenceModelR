@@ -11,7 +11,9 @@ Depends: affineModelR,
 		 SparseGrid,
 		 ukfRcpp
 Imports: Rcpp,
-         RcppArmadillo
+         RcppArmadillo,
+         tikzDevice,
+         tools
 LinkingTo: 
   Rcpp,
   RcppArmadillo,
