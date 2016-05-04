@@ -14,6 +14,29 @@ spec_1FtoyModel <- function(){
   model.spec$N.factors <- N.factors
   model.spec$jump.type <- 'kouExpJumpTransform'
   
+  model.spec$scaleFoo <- function(par.vec){
+    par.vec[1] <- -0.2 + 0.4*par.vec[1]
+    par.vec[2] <- -20 + 30 * par.vec[2]
+    par.vec[3] <- 1e-2 + 20 * par.vec[3]
+    par.vec[4] <- -1 + 2*par.vec[4]
+    par.vec[5] <- 1e-4 + 0.5 * par.vec[5]
+    par.vec[6] <- 1e-4 + 4 * par.vec[6]
+    par.vec[7] <- 1e-2 + 20 * par.vec[7]
+    par.vec[8] <- 1e-2 + 20 * par.vec[8]
+    par.vec[9] <- 1/(1e-4 + par.vec[9])
+    par.vec[10] <- -0.2 + 0.3 * par.vec[10]
+    par.vec[11] <- 1e-4 + 0.3 * par.vec[11]
+    par.vec[12] <- -0.2 + 0.4 * par.vec[12]
+    par.vec[13] <- 1/(1e-4 + par.vec[13])
+    par.vec[14] <- -0.15 + 0.3 * par.vec[14]
+    par.vec[15] <- 1e-4 + 0.3 * par.vec[15]
+    par.vec[16] <- -0.2 + 0.4 * par.vec[16]
+    par.vec[17] <- 1e-2 + 16 * par.vec[17]
+    par.vec[18] <- 1e-4 + 4 * par.vec[18]
+    
+    return(par.vec)
+  }
+  
   return(model.spec)
 }
 
@@ -83,6 +106,41 @@ spec_3FsepIntModel <- function(){
   model.spec$par.restr <- rbind(data.frame(par.name = "P$3$phi", par.value = 0),model.spec$par.restr)
   model.spec$N.factors <- N.factors
   model.spec$jump.type <- 'kouExpJumpTransform'
+  
+  model.spec$parScaleFoo <- function(par.vec){
+    
+    par.vec[1] <- -0.2 + 0.4*par.vec[1]           # P$1$erp0
+    par.vec[2] <- -20 + 30 * par.vec[2]           # P$1$erp
+    par.vec[3] <- 1e-2 + 20 * par.vec[3]          # P$1$kpp
+    par.vec[4] <- -1 + 2*par.vec[4]               # P$1$rho
+    par.vec[5] <- 1e-4 + 0.5 * par.vec[5]         # P$1$phi
+    par.vec[6] <- 1e-4 + 4 * par.vec[6]           # P$1$lmb
+    par.vec[7] <- 1e-2 + 20 * par.vec[7]          # P$2$kpp
+    par.vec[8] <- -1 + 2*par.vec[8]               # P$2$rho
+    par.vec[9] <- 1e-4 + 0.5 * par.vec[9]         # P$2$phi
+    par.vec[10] <- 1e-4 + 4 * par.vec[10]         # P$2$lmb
+    par.vec[11] <- 1e-2 + 20 * par.vec[11]        # P$3$kpp
+    par.vec[12] <- -1 + 2*par.vec[12]             # P$3$rho
+    par.vec[13] <- 1e-4 + 4 * par.vec[13]         # P$3$lmb
+    par.vec[14] <- 1e-4 + 20 * par.vec[14]        # P$jmp$lvec
+    par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lprop.1
+    par.vec[16] <- 1e-4 + 20 * par.vec[16]        # P$jmp$lprop.2
+    par.vec[17] <- 1e-4 + 20 * par.vec[17]        # P$jmp$lprop.3
+    par.vec[18] <- 2+1/(1e-4 + par.vec[18])       # P$jmp$muSc
+    par.vec[19] <- 1e-4 + 0.3 * par.vec[19]       # P$jmp$sigmaYc
+    par.vec[20] <- -0.2 + 0.4 * par.vec[20]       # P$jmp$rhoc
+    par.vec[21] <- 2+1/(1e-4 + par.vec[21])       # Q$jmp$muSc
+    par.vec[22] <- 1e-4 + 0.3 * par.vec[22]       # Q$jmp$sigmaYc
+    par.vec[23] <- -0.2 + 0.4 * par.vec[23]       # Q$jmp$rhoc
+    par.vec[24] <- 1e-2 + 20 * par.vec[24]        # Q$1$kpp
+    par.vec[25] <- 1e-2 + 2 * par.vec[25]         # Q$1$eta
+    par.vec[26] <- 1e-2 + 20 * par.vec[26]        # Q$2$kpp
+    par.vec[27] <- 1e-2 + 20 * par.vec[27]        # Q$3$kpp
+    par.vec[28] <- 1e-2 + 2 * par.vec[28]         # Q$3$eta
+    par.vec[29] <- 1e-4 + 20 * par.vec[29]        # Q$jmp$lprop.3
+    
+    return(par.vec)
+  }
   
   return(model.spec)  
 }
