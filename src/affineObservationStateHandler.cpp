@@ -49,9 +49,6 @@ arma::mat stockAndVolBeta = stockAndVolCov.submat(0,1,0,stockAndVolCov.n_cols-1)
 // This is the residual volatility of the stock that is not coming from vol
 // co-movement. This will go into the observation noise matrix position (1,1)
 arma::mat stockNoise = stockAndVolCov(0,0) - stockAndVolBeta * stockAndVolCov.submat(1,1,stockAndVolCov.n_rows-1,stockAndVolCov.n_cols-1) * stockAndVolBeta.t();
-if(stockNoise(0,0) < 0){
-  stockAndVolCov(0,0) = 1e-2 * stockAndVolCov(0,0);
-}
 
 // Evaluate divergence prices
 arma::cube cfCoeffs = Rcpp::as<arma::cube>(modelParameters["cfCoeffs"]);
@@ -115,6 +112,7 @@ for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
 // uncorrelated with portfolio observation noise.
 arma::mat obsNoiseMat(1+3*U*T,1+3*U*T,arma::fill::zeros);
 obsNoiseMat(0,0) = stockNoise(0,0);
+
 // 
 // // extract observation noise params
 // arma::vec bVec = Rcpp::as<arma::vec>(modelParameters["bVec"]);
