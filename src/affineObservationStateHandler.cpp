@@ -49,6 +49,9 @@ arma::mat stockAndVolBeta = stockAndVolCov.submat(0,1,0,stockAndVolCov.n_cols-1)
 // This is the residual volatility of the stock that is not coming from vol
 // co-movement. This will go into the observation noise matrix position (1,1)
 arma::mat stockNoise = stockAndVolCov(0,0) - stockAndVolBeta * stockAndVolCov.submat(1,1,stockAndVolCov.n_rows-1,stockAndVolCov.n_cols-1) * stockAndVolBeta.t();
+if(stockNoise(0,0) < 0){
+  stockAndVolCov(0,0) = 1e-2 * stockAndVolCov(0,0);
+}
 
 // Evaluate divergence prices
 arma::cube cfCoeffs = Rcpp::as<arma::cube>(modelParameters["cfCoeffs"]);
@@ -79,7 +82,8 @@ arma::mat tempDivergencePrices(U*T,1,arma::fill::zeros);
 for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
   // Write mean returns
   yhat(0,kcol) = stockMeans(kcol);
-  yhat(0,kcol) += arma::as_scalar(stockAndVolBeta * (stateMat.submat(0,kcol,Nf-1,kcol) - stateMat.submat(Nf,kcol,2*Nf-1,kcol)));
+  // Form stock updates in terms of deviations from the central prediction value
+  yhat(0,kcol) += arma::as_scalar(stockAndVolBeta * (stateMat.submat(0,kcol,Nf-1,kcol) - stateMat.submat(0,0,Nf-1,0)));
   // Write divergence prices
   tempPrices.reshape(U,T);
   tempPrices = divPrices.slice(kcol);
