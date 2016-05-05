@@ -40,18 +40,24 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   }
   
   # solve ODEs for pricing
-  ode.solutions <- Re(odeExtSolveWrap(
-        u = cbind(unique(spec.mat[,"p"]),matrix(0,length(unique(spec.mat[,"p"])),N.factors)), 
-        params.Q = params.Q, 
-        mkt = mkt.spec, 
-        jumpTransform = getPointerToJumpTransform(jump.type), 
-        N.factors = N.factors, 
-        mod.type = 'standard', 
-        rtol = 1e-12, atol = 1e-28
-      ))
+  ode.solutions <- tryCatch(
+        Re(odeExtSolveWrap(
+          u = cbind(unique(spec.mat[,"p"]),matrix(0,length(unique(spec.mat[,"p"])),N.factors)), 
+          params.Q = params.Q, 
+          mkt = mkt.spec, 
+          jumpTransform = getPointerToJumpTransform(jump.type), 
+          N.factors = N.factors, 
+          mod.type = 'standard', 
+          rtol = 1e-12, atol = 1e-28
+        ))
+      ,error = function(e){
+        print(e)
+        return(-1e15)
+        })
   
   # Calculate model dynamics coefficients
-  model.dynamics <- modelDynamics(
+  model.dynamics <- tryCatch(
+      modelDynamics(
         params.P = params.P, 
         params.Q = params.Q, 
         dT = time.dt, 
@@ -62,6 +68,10 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
         rtol = 1e-12, 
         atol = 1e-30
       )
+    , error = function(e){
+      print(e)
+      return(-1e15)
+    })
   
   # Transition equation setup
   vol.cov.array <- model.dynamics$cov.array[-1,-1]
@@ -84,7 +94,7 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   for(kk in 1:N.factors){
     deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
     deriv.u[2,kk+1] <- 1e-5
-    init.state.loc <- affineCF(
+    init.state.loc <- tryCatch(affineCF(
       u = deriv.u, 
       params.Q = params.Q, 
       params.P = NULL, 
@@ -96,7 +106,11 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       mod.type = 'standard', 
       atol = 1e-12, 
       rtol = 1e-10
-    )
+    ),
+    error = function(e){
+      print(e)
+      return(-1e15)
+    })
     q.init.state[,kk] <- drop(init.state.loc)
   }
   
@@ -113,7 +127,7 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
   for(kk in 1:N.factors){
     deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
     deriv.u[2,kk+1] <- 1e-5
-    init.state.loc <- affineCF(
+    init.state.loc <- tryCatch(affineCF(
       u = deriv.u, 
       params.Q = params.Q, 
       params.P = params.P, 
@@ -125,7 +139,11 @@ model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE,
       mod.type = 'standard', 
       atol = 1e-12, 
       rtol = 1e-10
-    )
+    ),
+    error = function(e){
+      print(e)
+      return(-1e15)
+    })
     init.state[,kk] <- drop(init.state.loc)
   }
   
