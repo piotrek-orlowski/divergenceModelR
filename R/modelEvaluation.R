@@ -6,7 +6,7 @@
 #' @return \code{evaluation_fittedPrices} returns a list with fields \code{obs} (the observed returns and swap prices) and \code{fit} (the predicted returns and fitted swap prices.)
 #' @export
 
-evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, N.points = 5){
+evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, handlerFoo = affineObservationStateHandler, N.points = 5){
   if(is.null(par.vec) & is.null(par.list)){
     stop("No parameters supplied: both par.vec and par.list are NULL")
   }
@@ -26,7 +26,7 @@ evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, mo
   
   obsParameters <- list(stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(1+model.spec$N.factors) ,diag = T)]), cfCoeffs = sol.derivs, tVec = data.structure$mkt$t, pVec = unique(data.structure$spec.mat$p), divNoiseCube = data.structure$noise.cov.cube)
 
-  swap.fit <- t(divergenceModelR::affineObservationStateHandler(stateMat = t(logLik$estimState[-1,,drop=F]), modelParameters = obsParameters, iterCount = 1)$yhat)
+  swap.fit <- t(handlerFoo(stateMat = t(logLik$estimState[-1,,drop=F]), modelParameters = obsParameters, iterCount = 1)$yhat)
   
   pred.ret <- apply(head(logLik$estimState[,1:model.spec$N.factors,drop=FALSE],-1), 1, meanVecFun, meanListS = model.dynamics$mean.vec[1])
   
@@ -37,7 +37,7 @@ evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, mo
 #' @details \code{evaluation_plotting} plots the following: (1) time series of filtered factor values, (2) time series of fitted and observed swap rates, (3) Q-Q plots of filtered factors and bootstrap sample from the estimated model factors, (4) autocorrelation functions of pricing errors, (5)
 #' @return \code{evaluation_plotting} does not return.
 #' @export
-evaluation_plotting <- function(par.vec, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, N.points = 5, plot.path){
+evaluation_plotting <- function(par.vec, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, handlerFoo = affineObservationStateHandler, N.points = 5, plot.path){
   
   # par lists
   par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, model.spec$N.factors)
@@ -45,17 +45,17 @@ evaluation_plotting <- function(par.vec, par.list = NULL, data.structure, model.
   model.spec$params.Q <- par.list$Q
   
   # fitted values
-  model.results <- evaluation_fittedPrices(par.vec = par.vec, par.list = par.list, data.structure = data.structure, model.spec = model.spec, filterFoo = filterFoo, N.points = N.points)
+  model.results <- evaluation_fittedPrices(par.vec = par.vec, par.list = par.list, data.structure = data.structure, model.spec = model.spec, filterFoo = filterFoo, N.points = N.points, handlerFoo = handlerFoo)
   
   fit <- model.results$fit
   
   dates <- data.structure$dates$date
   
   # plot fitted values
-  N.plots <- ncol(fit)-1
+  N.plots <- ncol(fit)
   for(npl in 1:N.plots){
     tikzDevice::tikz(file = paste0(plot.path,"swap-price-",npl,".tex"), width = 5, height = 3.7, standAlone = TRUE, sanitize = FALSE)
-      loc.data <- cbind(data.structure$obs.data[,1+npl], fit[,1+npl])
+      loc.data <- cbind(data.structure$obs.data[,npl+1], fit[,npl])
       title <- paste0("Price of ",as.character(data.structure$spec.mat$type[npl])," swap rate \n $\\tau=$",sprintf("%1.2f",data.structure$spec.mat$t[npl]),", $p=$", sprintf("%1.1f",data.structure$spec.mat$p[npl]))
       plot(dates, loc.data[,1], ylim = range(loc.data), type = 'l', lwd = 1.5, col = 'black', main = title, xlab = "Date", ylab = "Swap rate")
       lines(dates, loc.data[,2], lwd = 1.5, lty = 2, col = "darkgreen")
@@ -64,7 +64,7 @@ evaluation_plotting <- function(par.vec, par.list = NULL, data.structure, model.
   }
   
   # plot filtered states
-  for(npl in 1:N.factors){
+  for(npl in 1:model.spec$N.factors){
     tikzDevice::tikz(file = paste0(plot.path,"vol-factor-",npl,".tex"), width = 5, height = 3.7, standAlone = TRUE, sanitize = FALSE)
       if(model.spec$params.P[[as.character(npl)]]$phi == 0){
         title <- paste0("Filtered factor $V_",npl,"$")
@@ -80,7 +80,7 @@ evaluation_plotting <- function(par.vec, par.list = NULL, data.structure, model.
   # plot pricing error ACFs
   for(npl in 1:N.plots){
     tikzDevice::tikz(file = paste0(plot.path,"fit-err-acf-",npl,".tex"), width = 6, height = 3.7, standAlone = TRUE, sanitize = FALSE)
-    loc.data <- data.structure$obs.data[,1+npl] - fit[,1+npl]
+    loc.data <- data.structure$obs.data[,npl+1] - fit[,npl]
       layout(t(c(1:2)))
       par(mar = c(4.1,4.1,5.1,2.1))
       title <- paste0("Pricing error \n of ",as.character(data.structure$spec.mat$type[npl])," swap rate \n $\\tau=$",sprintf("%1.2f",data.structure$spec.mat$t[npl]),", $p=$", sprintf("%1.1f",data.structure$spec.mat$p[npl]))

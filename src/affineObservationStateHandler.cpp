@@ -130,6 +130,7 @@ Rcpp::List res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obs
 return res;
 }
 
+// [[Rcpp::export]]
 Rcpp::List affineObservationStateHandler_D(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount){
   
   // In state mat, additionally, to state values, we carry the past filtered state
@@ -228,6 +229,7 @@ Rcpp::List affineObservationStateHandler_D(const arma::mat& stateMat, const Rcpp
   return res;
 }
 
+// [[Rcpp::export]]
 Rcpp::List affineObservationStateHandler_DS(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount){
   
   // In state mat, additionally, to state values, we carry the past filtered state
