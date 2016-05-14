@@ -355,7 +355,7 @@ spec_3FsepIntModel_extraNoise <- function(U){
     par.vec[26] <- 1e-2 + 2 * par.vec[26]         # Q$3$eta
     par.vec[27] <- 1e-4 + 20 * par.vec[27]        # Q$jmp$lprop.1
     par.vec[28] <- 1e-4 + 20 * par.vec[28]        # Q$jmp$lprop.3
-    for(kk in 29:(29+U)){
+    for(kk in 29:(29+U-1)){
       par.vec[kk] <- 1e-4 + 1e-1 * par.vec[kk]
     }
     
