@@ -122,7 +122,12 @@ obsNoiseMat(0,0) = stockNoise(0,0);
 // obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divModelObsNoiseMat(cVec,bVec,spotVol,tVec,U);
 SEXP divBigMat_SEXP(modelParameters["divNoiseCube"]);
 arma::cube divBigMat = as<arma::cube>(divBigMat_SEXP);
-obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = divBigMat.slice(iterCount);
+
+arma::vec errSdParVec = as<arma::vec>(modelParameters["errSdParVec"]);
+double sumStates = arma::accu(stateMat.submat(0,0,Nf-1,0));
+errSdParVec *= sumStates;
+
+obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = arma::diagmat(errSdParVec) * divBigMat.slice(iterCount) * arma::diagmat(errSdParVec);
 
 // Initialize return list
 Rcpp::List res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obsNoiseMat") = obsNoiseMat);
