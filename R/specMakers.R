@@ -474,3 +474,44 @@ spec_3FsepIntModel_extraNoise <- function(U){
   
   return(model.spec)  
 }
+
+#' @describeIn modSetup
+#' @details \code{spec_1FtoyModel_extraNoise}  Specifies a single-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. There are variance parameters for observation noise.
+#' @export
+spec_1FtoyModel_extraNoise <- function(U){
+  
+  N.factors <- 1
+  model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.", 1:N.factors)))
+  model.spec$par.names <- c(model.spec$par.names[1], as.character(model.spec$par.restr$par.name[1]), model.spec$par.names[-1])
+  model.spec$par.restr <- model.spec$par.restr[-1,]
+  model.spec$N.factors <- N.factors
+  model.spec$jump.type <- 'kouExpJumpTransform'
+  
+  model.spec$scaleFoo <- function(par.vec){
+    par.vec[1] <- -0.2 + 0.4*par.vec[1]
+    par.vec[2] <- -20 + 30 * par.vec[2]
+    par.vec[3] <- 1e-2 + 20 * par.vec[3]
+    par.vec[4] <- -1 + 2*par.vec[4]
+    par.vec[5] <- 1e-4 + 0.5 * par.vec[5]
+    par.vec[6] <- 1e-4 + 4 * par.vec[6]
+    par.vec[7] <- 1e-2 + 20 * par.vec[7]
+    par.vec[8] <- 1e-2 + 20 * par.vec[8]
+    par.vec[9] <- 1/(1e-4 + par.vec[9])
+    par.vec[10] <- -0.2 + 0.3 * par.vec[10]
+    par.vec[11] <- 1e-4 + 0.3 * par.vec[11]
+    par.vec[12] <- -0.2 + 0.4 * par.vec[12]
+    par.vec[13] <- 1/(1e-4 + par.vec[13])
+    par.vec[14] <- -0.15 + 0.3 * par.vec[14]
+    par.vec[15] <- 1e-4 + 0.3 * par.vec[15]
+    par.vec[16] <- -0.2 + 0.4 * par.vec[16]
+    par.vec[17] <- 1e-2 + 16 * par.vec[17]
+    par.vec[18] <- 1e-4 + 4 * par.vec[18]
+    for(kk in 19:(19+U-1)){
+      par.vec[kk] <- 1e-4 + 1e-1 * par.vec[kk]
+    }
+    
+    return(par.vec)
+  }
+  
+  return(model.spec)
+}
