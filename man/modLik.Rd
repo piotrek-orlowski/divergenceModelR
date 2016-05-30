@@ -3,12 +3,10 @@
 \name{modLik}
 \alias{modLik}
 \alias{model_Likelihood}
-\alias{model_Likelihood_extraNoise}
 \alias{model_fellerConditionCheck}
 \alias{model_makeDefaultParameterStructures}
 \alias{model_translateParameters}
 \alias{model_wrapLikelihood}
-\alias{model_wrapLikelihood_extraNoise}
 \title{Affine model likelihood based on divergence prices}
 \usage{
 model_Likelihood(data.structure, model.spec, for.estimation = FALSE,
@@ -25,14 +23,6 @@ model_wrapLikelihood(data.structure, model.spec, for.estimation = FALSE,
   filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty)
 
 model_fellerConditionCheck(params.P, params.Q, N.factors)
-
-model_Likelihood_extraNoise(data.structure, model.spec,
-  for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5,
-  penalized = FALSE, penalty = 1e+12)
-
-model_wrapLikelihood_extraNoise(data.structure, model.spec,
-  for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5,
-  penalized = FALSE, penalty)
 }
 \arguments{
 \item{data.structure}{\code{list} with fields \code{spec.mat}, \code{obs.data}, \code{noise.cov.cube}}
@@ -54,8 +44,6 @@ model_wrapLikelihood_extraNoise(data.structure, model.spec,
 \item{par.restr}{parameter equality restrictions, data.frame; par.vec and par.restr have to exhaust the model parameter set together.}
 
 \item{N.factors}{integer, number of SV factors}
-
-\item{noisePar}{vector of noise variance magnitudes, equal to number of observed pfolios}
 }
 \value{
 \code{model_Likelihood} if \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
@@ -67,10 +55,6 @@ model_wrapLikelihood_extraNoise(data.structure, model.spec,
 \code{model_wrapLikelihood} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 
 \code{model_fellerConditionCheck} list with two logical vectors reporting whether the Feller conditions are satisfied
-
-\code{model_Likelihood_extraNoise} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
-
-\code{model_wrapLikelihood_extraNoise} wraps the likelihood function with extra noise so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 }
 \description{
 Functions for preparing model specification, evaluating the likelihood for the DSQ filtering.
@@ -87,9 +71,5 @@ Not much for now
 \item \code{model_wrapLikelihood}: 
 
 \item \code{model_fellerConditionCheck}: 
-
-\item \code{model_Likelihood_extraNoise}: 
-
-\item \code{model_wrapLikelihood_extraNoise}: 
 }}
 

@@ -25,7 +25,7 @@ List DSQ_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const ar
   filterInstance.filterSqrtAdditiveNoise();
   
   // Set return variable
-  List res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL());
+  List res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL(), Named("predMat") = filterInstance.getPredMat());
   
   return res;
 }

@@ -3,39 +3,21 @@
 \name{modSetup}
 \alias{modSetup}
 \alias{specData_DSQ_1M_6M_0115}
-\alias{specData_DSQ_1M_6M_0115_cor}
 \alias{specData_DS_1M_6M_0115}
-\alias{specData_DS_1M_6M_0115_cor}
 \alias{specData_D_1M_6M_0115}
-\alias{specData_D_1M_6M_0115_cor}
 \alias{spec_1FtoyModel}
-\alias{spec_1FtoyModel_extraNoise}
 \alias{spec_3FsepIntModel}
-\alias{spec_3FsepIntModel_extraNoise}
 \title{Model setup -- specification generators}
 \usage{
 spec_1FtoyModel()
 
 specData_DSQ_1M_6M_0115(path.to.data)
 
-specData_DSQ_1M_6M_0115_cor(path.to.data)
-
 specData_DS_1M_6M_0115(path.to.data)
-
-specData_DS_1M_6M_0115_cor(path.to.data)
 
 specData_D_1M_6M_0115(path.to.data)
 
-specData_D_1M_6M_0115_cor(path.to.data)
-
 spec_3FsepIntModel()
-
-spec_3FsepIntModel_extraNoise(U)
-
-spec_1FtoyModel_extraNoise(U)
-}
-\arguments{
-\item{U}{number of observed pfolios}
 }
 \value{
 \code{model.spec} and \code{data.structure} objects
@@ -48,40 +30,20 @@ Functions which fix model and data specifications for estimation. These function
 
 \code{specData_DSQ_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error varcov matrices.
 
-\code{specData_DSQ_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices.
-
 \code{specData_DS_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error varcov matrices. Excludes quarticity
-
-\code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 
 \code{specData_D_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error varcov matrices. Excludes skewness and quarticity
 
-\code{specData_D_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes skewness and quarticity
-
-\code{spec_3FsepIntModel} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There are variance parameters for observation noise.
-
-\code{spec_3FsepIntModel_extraNoise} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There are variance parameters for observation noise.
-
-\code{spec_1FtoyModel_extraNoise}  Specifies a single-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. There are variance parameters for observation noise.
+\code{spec_3FsepIntModel} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility
 }
 \section{Functions}{
 \itemize{
 \item \code{specData_DSQ_1M_6M_0115}: 
 
-\item \code{specData_DSQ_1M_6M_0115_cor}: 
-
 \item \code{specData_DS_1M_6M_0115}: 
-
-\item \code{specData_DS_1M_6M_0115_cor}: 
 
 \item \code{specData_D_1M_6M_0115}: 
 
-\item \code{specData_D_1M_6M_0115_cor}: 
-
 \item \code{spec_3FsepIntModel}: 
-
-\item \code{spec_3FsepIntModel_extraNoise}: 
-
-\item \code{spec_1FtoyModel_extraNoise}: 
 }}
 
