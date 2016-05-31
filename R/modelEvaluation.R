@@ -58,7 +58,7 @@ evaluation_plotting <- function(par.vec, model_Likelihood= model_Likelihood, par
       loc.data <- cbind(data.structure$obs.data[,npl+1], fit[,npl])
       title <- paste0("Price of ",as.character(data.structure$spec.mat$type[npl])," swap rate \n $\\tau=$",sprintf("%1.2f",data.structure$spec.mat$t[npl]),", $p=$", sprintf("%1.1f",data.structure$spec.mat$p[npl]))
       plot(dates, loc.data[,1], ylim = range(loc.data), type = 'l', lwd = 1.5, col = 'black', main = title, xlab = "Date", ylab = "Swap rate")
-      lines(dates, loc.data[,2], lwd = 1.5, lty = 2, col = "darkgreen")
+      lines(dates, loc.data[,2], lwd = 1.5, lty = 2, col = "darkorange")
     dev.off()
     tools::texi2pdf(file = paste0(plot.path,"swap-price-",npl,".tex"), clean = TRUE, quiet = TRUE)
   }
