@@ -379,14 +379,14 @@ spec_3FsepIntModel <- function(){
   model.spec$scaleFoo <- function(par.vec){
     
     par.vec[1] <- -0.2 + 0.4*par.vec[1]           # P$1$erp0
-    par.vec[2] <- -20 + 30 * par.vec[2]           # P$1$erp
+    par.vec[2] <- -0.1 + 0.2 * par.vec[2]         # P$2$erp
     par.vec[3] <- 1e-2 + 20 * par.vec[3]          # P$1$kpp
     par.vec[4] <- -1 + 2*par.vec[4]               # P$1$rho
     par.vec[5] <- 1e-4 + 0.5 * par.vec[5]         # P$1$phi
     par.vec[6] <- 1e-4 + 4 * par.vec[6]           # P$1$lmb
     par.vec[7] <- 1e-2 + 20 * par.vec[7]          # P$2$kpp
     par.vec[8] <- 1e-4 + 0.5 * par.vec[8]         # P$2$phi
-    par.vec[9] <- 1e-4 + 4 * par.vec[9]         # P$2$lmb
+    par.vec[9] <- 1e-4 + 4 * par.vec[9]           # P$2$lmb
     par.vec[10] <- 1e-2 + 20 * par.vec[10]        # P$3$kpp
     par.vec[11] <- 1e-4 + 4 * par.vec[11]         # P$3$lmb
     par.vec[12] <- 1e-4 + 20 * par.vec[12]        # P$jmp$lvec
@@ -422,8 +422,8 @@ spec_3FsepIntModel_extraNoise <- function(U){
   
   N.factors <- 3
   model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.", 2),"Q$jmp$muYc",paste0("Q$",2,"$eta")))
-  model.spec$par.names <- c(model.spec$par.names[1], as.character(model.spec$par.restr$par.name[1]), model.spec$par.names[-1])
-  model.spec$par.restr <- model.spec$par.restr[-1,]
+  model.spec$par.names <- c(model.spec$par.names, "P$2$erp")
+  model.spec$par.restr <- model.spec$par.restr[-which(grepl("P.2.erp",model.spec$par.restr$par.name)),]
   model.spec$par.names <- model.spec$par.names[-which(grepl("P.jmp.muYc",model.spec$par.names))]
   model.spec$par.restr <- rbind(data.frame(par.name = "P$jmp$muYc", par.value = 0),model.spec$par.restr)
   model.spec$par.names <- model.spec$par.names[-which(grepl("P.3.phi",model.spec$par.names))]
@@ -435,36 +435,42 @@ spec_3FsepIntModel_extraNoise <- function(U){
   model.spec$N.factors <- N.factors
   model.spec$jump.type <- 'kouExpJumpTransform'
   
+  model.spec$par.names <- model.spec$par.names[order(model.spec$par.names)]
+  model.spec$par.restr <- model.spec$par.restr[order(as.character(model.spec$par.restr$par.name)),]
+  
   model.spec$scaleFoo <- function(par.vec){
     
     par.vec[1] <- -0.2 + 0.4*par.vec[1]           # P$1$erp0
-    par.vec[2] <- -20 + 30 * par.vec[2]           # P$1$erp
-    par.vec[3] <- 1e-2 + 20 * par.vec[3]          # P$1$kpp
-    par.vec[4] <- -1 + 2*par.vec[4]               # P$1$rho
-    par.vec[5] <- 1e-4 + 0.5 * par.vec[5]         # P$1$phi
-    par.vec[6] <- 1e-4 + 4 * par.vec[6]           # P$1$lmb
+    par.vec[2] <- 1e-2 + 20 * par.vec[2]          # P$1$kpp
+    par.vec[3] <- 1e-4 + 4 * par.vec[3]           # P$1$lmb
+    par.vec[4] <- 1e-4 + 0.5 * par.vec[4]         # P$1$phi
+    par.vec[5] <- -1 + 2*par.vec[5]               # P$1$rho
+    par.vec[6] <- -0.2 + 0.2 * par.vec[6]           # P$2$erp
     par.vec[7] <- 1e-2 + 20 * par.vec[7]          # P$2$kpp
-    par.vec[8] <- 1e-4 + 0.5 * par.vec[8]         # P$2$phi
-    par.vec[9] <- 1e-4 + 4 * par.vec[9]         # P$2$lmb
+    par.vec[8] <- 1e-4 + 4 * par.vec[8]         # P$2$lmb
+    par.vec[9] <- 1e-4 + 0.5 * par.vec[9]         # P$2$phi
     par.vec[10] <- 1e-2 + 20 * par.vec[10]        # P$3$kpp
     par.vec[11] <- 1e-4 + 4 * par.vec[11]         # P$3$lmb
-    par.vec[12] <- 1e-4 + 20 * par.vec[12]        # P$jmp$lvec
-    par.vec[13] <- 1e-4 + 20 * par.vec[13]        # P$jmp$lprop.1
-    par.vec[14] <- 1e-4 + 20 * par.vec[14]        # P$jmp$lprop.2
-    par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lprop.3
+    par.vec[12] <- 1e-4 + 20 * par.vec[12]        # P$jmp$lprop.1
+    par.vec[13] <- 1e-4 + 20 * par.vec[13]        # P$jmp$lprop.2
+    par.vec[14] <- 1e-4 + 20 * par.vec[14]        # P$jmp$lprop.3
+    par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lvec
     par.vec[16] <- 2+1/(1e-4 + par.vec[16])       # P$jmp$muSc
-    par.vec[17] <- 1e-4 + 0.3 * par.vec[17]       # P$jmp$sigmaYc
-    par.vec[18] <- -0.2 + 0.4 * par.vec[19]       # P$jmp$rhoc
-    par.vec[19] <- 2+1/(1e-4 + par.vec[19])       # Q$jmp$muSc
-    par.vec[20] <- 1e-4 + 0.3 * par.vec[20]       # Q$jmp$sigmaYc
-    par.vec[21] <- -0.2 + 0.4 * par.vec[21]       # Q$jmp$rhoc
-    par.vec[22] <- 1e-2 + 20 * par.vec[22]        # Q$1$kpp
-    par.vec[23] <- 1e-2 + 2 * par.vec[23]         # Q$1$eta
-    par.vec[24] <- 1e-2 + 20 * par.vec[24]        # Q$2$kpp
-    par.vec[25] <- 1e-2 + 20 * par.vec[25]        # Q$3$kpp
-    par.vec[26] <- 1e-2 + 2 * par.vec[26]         # Q$3$eta
-    par.vec[27] <- 1e-4 + 20 * par.vec[27]        # Q$jmp$lprop.1
-    par.vec[28] <- 1e-4 + 20 * par.vec[28]        # Q$jmp$lprop.3
+    par.vec[17] <- -0.2 + 0.4 * par.vec[17]       # P$jmp$rhoc
+    par.vec[18] <- 1e-4 + 0.3 * par.vec[18]       # P$jmp$sigmaYc
+    par.vec[19] <- 1e-2 + 2 * par.vec[19]         # Q$1$eta
+    par.vec[20] <- 1e-2 + 20 * par.vec[20]        # Q$1$kpp
+    par.vec[21] <- 1e-2 + 20 * par.vec[21]        # Q$2$kpp
+    par.vec[22] <- 1e-2 + 2 * par.vec[22]         # Q$3$eta
+    par.vec[23] <- 1e-2 + 20 * par.vec[23]        # Q$3$kpp
+    par.vec[24] <- 1e-4 + 20 * par.vec[24]        # Q$jmp$lprop.1
+    par.vec[25] <- 1e-4 + 20 * par.vec[25]        # Q$jmp$lprop.3
+    par.vec[26] <- 2+1/(1e-4 + par.vec[26])       # Q$jmp$muSc
+    par.vec[27] <- -0.2 + 0.4 * par.vec[27]       # Q$jmp$rhoc
+    par.vec[28] <- 1e-4 + 0.3 * par.vec[28]       # Q$jmp$sigmaYc
+    
+    
+    
     for(kk in 29:(29+U-1)){
       par.vec[kk] <- 1e-4 + 1e-1 * par.vec[kk]
     }
@@ -482,30 +488,35 @@ spec_1FtoyModel_extraNoise <- function(U){
   
   N.factors <- 1
   model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.", 1:N.factors)))
-  model.spec$par.names <- c(model.spec$par.names[1], as.character(model.spec$par.restr$par.name[1]), model.spec$par.names[-1])
-  model.spec$par.restr <- model.spec$par.restr[-1,]
+  erp.pos <- which(grepl("erp",as.character(model.spec$par.restr$par.name)))
+  model.spec$par.names <- c(model.spec$par.names[1], as.character(model.spec$par.restr$par.name[erp.pos]), model.spec$par.names[-1])
+  model.spec$par.restr <- model.spec$par.restr[-erp.pos,]
   model.spec$N.factors <- N.factors
   model.spec$jump.type <- 'kouExpJumpTransform'
   
+  model.spec$par.names <- model.spec$par.names[order(model.spec$par.names)]
+  model.spec$par.restr <- model.spec$par.restr[order(as.character(model.spec$par.restr$par.name)),]
+  
   model.spec$scaleFoo <- function(par.vec){
     par.vec[1] <- -0.2 + 0.4*par.vec[1]
-    par.vec[2] <- -20 + 30 * par.vec[2]
+    par.vec[2] <- -0.2 + 0.3 * par.vec[2]
     par.vec[3] <- 1e-2 + 20 * par.vec[3]
-    par.vec[4] <- -1 + 2*par.vec[4]
+    par.vec[4] <- 1e-4 + 4 * par.vec[4]
     par.vec[5] <- 1e-4 + 0.5 * par.vec[5]
-    par.vec[6] <- 1e-4 + 4 * par.vec[6]
+    par.vec[6] <- -1 + 2*par.vec[6]
     par.vec[7] <- 1e-2 + 20 * par.vec[7]
     par.vec[8] <- 1e-2 + 20 * par.vec[8]
     par.vec[9] <- 1/(1e-4 + par.vec[9])
     par.vec[10] <- -0.2 + 0.3 * par.vec[10]
-    par.vec[11] <- 1e-4 + 0.3 * par.vec[11]
-    par.vec[12] <- -0.2 + 0.4 * par.vec[12]
-    par.vec[13] <- 1/(1e-4 + par.vec[13])
+    par.vec[11] <- -0.2 + 0.4 * par.vec[11]
+    par.vec[12] <- 1e-4 + 0.3 * par.vec[12]
+    par.vec[13] <- 1e-4 + 4 * par.vec[13]
+    par.vec[14] <- 1e-2 + 16 * par.vec[14]
+    par.vec[15] <- 1/(1e-4 + par.vec[15])
     par.vec[14] <- -0.15 + 0.3 * par.vec[14]
-    par.vec[15] <- 1e-4 + 0.3 * par.vec[15]
-    par.vec[16] <- -0.2 + 0.4 * par.vec[16]
-    par.vec[17] <- 1e-2 + 16 * par.vec[17]
-    par.vec[18] <- 1e-4 + 4 * par.vec[18]
+    par.vec[15] <- -0.2 + 0.4 * par.vec[15]
+    par.vec[16] <- 1e-4 + 0.3 * par.vec[16]
+    
     for(kk in 19:(19+U-1)){
       par.vec[kk] <- 1e-4 + 1e-1 * par.vec[kk]
     }

@@ -361,9 +361,9 @@ model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$j
     loc.df <- rbind(loc.df, data.frame(par.name = paste0("Q$",kk,"$rho"), par.value = -999))
     loc.df <- rbind(loc.df, data.frame(par.name = paste0("Q$",kk,"$lmb"), par.value = -999))
     loc.df <- rbind(loc.df, data.frame(par.name = paste0("Q$",kk,"$phi"), par.value = -999))
+    loc.df <- rbind(loc.df, data.frame(par.name = paste0("P$",kk,"$erp"), par.value = 0))
   }
   par.restr <- loc.df
-  par.restr <- rbind(data.frame(par.name = "P$1$erp", par.value = 0), par.restr)
   
   #   names <- c('P$svFast$kpp','P$svFast$lmb','P$svFast$rho','P$svFast$eta','P$svSlow$kpp','P$svSlow$lmb','P$svSlow$rho','P$svSlow$eta','Q$svFast$kpp','Q$svFast$eta','Q$svSlow$kpp','Q$svSlow$eta','P$jmp$lvec','P$jmp$lprop.1','P$jmp$lprop.2','P$jmp$muY','P$jmp$sigmaY','Q$jmp$muY','Q$jmp$sigmaY')
     
