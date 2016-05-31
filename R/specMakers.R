@@ -455,7 +455,7 @@ spec_3FsepIntModel_extraNoise <- function(U){
     par.vec[13] <- 1e-4 + 20 * par.vec[13]        # P$jmp$lprop.2
     par.vec[14] <- 1e-4 + 20 * par.vec[14]        # P$jmp$lprop.3
     par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lvec
-    par.vec[16] <- 2+1/(1e-4 + par.vec[16])       # P$jmp$muSc
+    par.vec[16] <- 1+1/(1e-2 + par.vec[16])       # P$jmp$muSc
     par.vec[17] <- -0.2 + 0.4 * par.vec[17]       # P$jmp$rhoc
     par.vec[18] <- 1e-4 + 0.3 * par.vec[18]       # P$jmp$sigmaYc
     par.vec[19] <- 1e-2 + 2 * par.vec[19]         # Q$1$eta
@@ -465,7 +465,7 @@ spec_3FsepIntModel_extraNoise <- function(U){
     par.vec[23] <- 1e-2 + 20 * par.vec[23]        # Q$3$kpp
     par.vec[24] <- 1e-4 + 20 * par.vec[24]        # Q$jmp$lprop.1
     par.vec[25] <- 1e-4 + 20 * par.vec[25]        # Q$jmp$lprop.3
-    par.vec[26] <- 2+1/(1e-4 + par.vec[26])       # Q$jmp$muSc
+    par.vec[26] <- 1+1/(1e-2 + par.vec[26])       # Q$jmp$muSc
     par.vec[27] <- -0.2 + 0.4 * par.vec[27]       # Q$jmp$rhoc
     par.vec[28] <- 1e-4 + 0.3 * par.vec[28]       # Q$jmp$sigmaYc
     
