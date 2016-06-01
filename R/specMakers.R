@@ -601,3 +601,68 @@ spec_3FsepIntModel_erp_extraNoise <- function(U){
   
   return(model.spec)  
 }
+
+#' @describeIn modSetup
+#' @details \code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
+#' @export
+specData_DS_1M_6M_0115_cor_p0.0_p0.5 <- function(path.to.data){
+  
+  load(paste0(path.to.data,"divergence-prices-omtr-asymptotic-iv-for-estimation.RData"))
+  load(paste0(path.to.data,"SP500_daily.RData"))
+  
+  pVec <- c(0,0.5)
+  tVec <- c(1/12,1/2)
+  
+  mkt <- data.frame(p=1,q=0,r=0,t=tVec)
+  
+  require(dplyr)
+  
+  date.subset <- which(unique(db$day) >= as.Date("2001-01-01"))
+  ret.start.date <- unique(db$day)[date.subset[1]-1]
+  
+  data.spec <- expand.grid(p= unique(db$u), t= unique(db$t), type = c('div','skew','quart'))
+  obs.spec <- expand.grid(p= pVec, t= tVec, type = c('div','skew'))
+  
+  db <- db %>% filter(day >= as.Date("2001-01-01")) %>% filter(u %in% pVec) %>% filter(t %in% tVec)
+  db <- db %>% mutate(div = div/t)
+  
+  obs.data <- db %>% select(day) %>% distinct
+  
+  for(tp in c("div","skew_scaled")){
+    for(tt in tVec){
+      for(pp in pVec){
+        tmp <- db %>% filter(t == tt, u == pp) %>% select_("day",tp)
+        colnames(tmp) <- c("day",paste0(tp,"_",sprintf("%1.3f",tt),"_",sprintf("%1.2f",pp)))
+        obs.data <- inner_join(obs.data,tmp,by="day")
+      }
+    }
+  }
+  # obs.data <- db %>% filter(t == 1/12) %>% select(day,div,skew_scaled)
+  # obs.data <- cbind(obs.data, db %>% filter(t == 1/2) %>% select(div,skew_scaled))
+  # colnames(obs.data) <- c("day","div_0.083_0.5","skew_0.083_0.5","div_0.5_0.5","skew_0.5_0.5")
+  # obs.data <- obs.data %>% select(day, div_0.083_0.5, div_0.5_0.5, skew_0.083_0.5, skew_0.5_0.5)
+  
+  SP500_daily <- SP500_daily %>% filter(date >= ret.start.date, date <= max(obs.data$day))
+  date.ranges <- cbind.data.frame(start= c(ret.start.date,head(obs.data$day,-1)), end = obs.data$day)
+  SP500_weekly <- apply(X = date.ranges, MARGIN = 1, FUN = function(x){
+    loc.sp <- SP500_daily %>% filter(date > x["start"], date <= x["end"])
+    ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
+    return(ret.df)
+  })
+  SP500_weekly <- rbind_all(SP500_weekly)
+  SP500_weekly <- SP500_weekly %>% mutate(date = as.Date(date))  
+  obs.data <- SP500_weekly %>% inner_join(obs.data, by = c("date"="day"))
+  
+  data.spec <- cbind(data.spec,index = 1:nrow(data.spec))
+  obs.spec <- data.spec %>% inner_join(obs.spec)
+  
+  noise.cov.cube <- db.vcov[obs.spec$index,obs.spec$index,date.subset]
+  noise.cov.cube[which(obs.spec$type=='div'),which(obs.spec$type=='div'),] <- noise.cov.cube[which(obs.spec$type=='div'),which(obs.spec$type=='div'),] * array(outer(1/rep(tVec,each=length(pVec)), 1/rep(tVec,each=length(pVec))), dim = c(length(tVec)*length(pVec), length(tVec)*length(pVec), dim(noise.cov.cube)[3]))
+  dt <- 7/365
+  
+  noise.cov.cube <- apply(noise.cov.cube,3,cov2cor)
+  noise.cov.cube <- array(as.numeric(noise.cov.cube), dim = c(ncol(obs.data)-2,ncol(obs.data)-2,nrow(obs.data)))
+  
+  spec.mat <- obs.spec %>% select(-index)
+  return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
+}
