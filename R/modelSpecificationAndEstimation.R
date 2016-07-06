@@ -642,7 +642,7 @@ model_wrapLikelihood_extraNoise <- function(data.structure, model.spec, for.esti
 model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12, N.GL.points = 64){
   
   # quadrature setup
-  gl <- gauss.quad(n = N.GL.points, kind = "laguerre", alpha = 0)
+  gl <- statmod::gauss.quad(n = N.GL.points, kind = "laguerre", alpha = 0)
   
   # Extract some variables from model specification
   N.factors <- model.spec$N.factors
@@ -846,7 +846,7 @@ model_wrapLikelihood_portfolio_extraNoise <- function(data.structure, model.spec
   
   retFoo <- function(par.vec){
     noise.par <- tail(par.vec,ncol(data.structure$obs.data)-1)
-    par.vec <- head(par.vec,-ncol(data.structure$obs.data)-1)
+    par.vec <- head(par.vec,-(ncol(data.structure$obs.data)-1))
     model.spec$noise.par <- noise.par
     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
     model.spec$params.P <- par.list$P
