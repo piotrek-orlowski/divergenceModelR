@@ -150,4 +150,4 @@ system.time(test <- divergenceModelR:::portfolio_sqrtFilter(dataMat = obsData, i
 
 #### GET LIKELIHOOD ####
 
-modLik <- model_wrapLikelihood_portfolio_extraNoise(data.structure = specData_PF_DSQ_3Mat("d:/git/LugTeX/swapRateModel/optData/"), model.spec = model.spec, for.estimation = T, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 3, penalized = T, penalty = 1e8)
+modLik <- model_wrapLikelihood_portfolio_extraNoise(data.structure = data.structure, model.spec = model.spec, for.estimation = T, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 3, penalized = T, penalty = 1e8)

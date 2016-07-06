@@ -74,16 +74,9 @@ Rcpp::List affineObservationStateHandler_optionPortfolios(const arma::mat& state
   arma::mat mkt  = Rcpp::as<arma::mat>(mkt_list[iterCount]);
   arma::cube wts = Rcpp::as<arma::cube>(wts_list[iterCount]); // cube dimension T x K x W
   
-  // add discounting to characteristic function coefficients
-  arma::cx_cube driftMat(cfCoeffs);
-  driftMat.fill(0.0);
-  arma::mat dscnting = (mkt.col(0) % (mkt.col(1)-mkt.col(2))).t();
-  arma::mat dscnting_imag(dscnting);
-  dscnting_imag.fill(0.0);
-  arma::cx_mat dscnting_cx(dscnting,dscnting_imag);
-  driftMat.slice(Nf) = glNodes * dscnting_cx;
-  cfCoeffs = cfCoeffs + driftMat;
-  // 
+  // define 1i imaginary
+  std::complex<double> i1(0,1);
+  
   // evaluate characteristic function at test states (upper rows of stateMat, transposed)
   arma::cx_cube cfVals = affineCFevalCpp(cfCoeffs, stateMat.rows(0,Nf-1).t(), false);
   

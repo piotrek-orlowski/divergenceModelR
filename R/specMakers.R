@@ -666,3 +666,47 @@ specData_DS_1M_6M_0115_cor_p0.0_p0.5 <- function(path.to.data){
   spec.mat <- obs.spec %>% select(-index)
   return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
 }
+
+#' @describeIn modSetup
+#' @details \code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
+#' @export
+specData_PF_DSQ_3Mat <- function(path.to.data){
+  
+  load(paste0(path.to.data,"spx-pfolio-drgs-noise.RData"))
+  load(paste0(path.to.data,"SP500_daily.RData"))
+  
+  require(dplyr)
+  
+  date.subset <- which(unique(div.db$date) >= as.Date("2001-01-01"))
+  ret.start.date <- unique(div.db$date)[date.subset[1]-1]
+  
+  mkt.list <- mkt.list[date.subset]
+  wts.list <- wts.list[date.subset]
+  strike.list <- strike.list[date.subset]
+  
+  div.db <- div.db %>% filter(date >= as.Date("2001-01-01"))
+  div.db <- div.db %>% select(div_mid, skew_mid, quart_mid)
+  
+  obs.data <- matrix(as.numeric(t(as.matrix(div.db[,-1]))), nrow = nrow(div.db)/3, ncol = (ncol(div.db)-1)*3, byrow = T)
+  obs.data <- data.frame(day = unique(div.db$date), obs.data)
+  
+  SP500_daily <- SP500_daily %>% filter(date >= ret.start.date, date <= max(obs.data$day))
+  date.ranges <- cbind.data.frame(start= c(ret.start.date,head(obs.data$day,-1)), end = obs.data$day)
+  SP500_weekly <- apply(X = date.ranges, MARGIN = 1, FUN = function(x){
+    loc.sp <- SP500_daily %>% filter(date > x["start"], date <= x["end"])
+    ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
+    return(ret.df)
+  })
+  SP500_weekly <- rbind_all(SP500_weekly)
+  SP500_weekly <- SP500_weekly %>% mutate(date = as.Date(date))  
+  obs.data <- SP500_weekly %>% inner_join(obs.data, by = c("date"="day"))
+  
+  noise.cov.cube <- noise.cov.cube[,,(dim(noise.cov.cube)[3] - nrow(obs.data) + 1):dim(noise.cov.cube)[3]]
+  
+  dt <- 7/365
+  
+  noise.cov.cube <- apply(noise.cov.cube,3,cov2cor)
+  noise.cov.cube <- array(as.numeric(noise.cov.cube), dim = c(ncol(obs.data)-2,ncol(obs.data)-2,nrow(obs.data)))
+  
+  return(list(dt = dt, noise.cov.cube = noise.cov.cube, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt.list = mkt.list, wts.list = wts.list, strikeMat.list = strike.list))
+}
