@@ -2,22 +2,31 @@
 % Please edit documentation in R/specMakers.R
 \name{modSetup}
 \alias{modSetup}
-\alias{specData_DSQ_1M_6M_0115}
-\alias{specData_DS_1M_6M_0115}
-\alias{specData_D_1M_6M_0115}
-\alias{spec_1FtoyModel}
-\alias{spec_3FsepIntModel}
+\alias{specData_DSQ_1M_6M_0115_extraNoise}
+\alias{specData_DS_1M_6M_0115_extraNoise}
+\alias{specData_D_1M_6M_0115_extraNoise}
+\alias{specData_PF_DSQ_3Mat}
+\alias{spec_1FtoyModel_extraNoise}
+\alias{spec_3FsepIntModel_erp_extraNoise}
+\alias{spec_3FsepIntModel_erp_portfolio}
 \title{Model setup -- specification generators}
 \usage{
-spec_1FtoyModel()
+specData_DSQ_1M_6M_0115_extraNoise(path.to.data)
 
-specData_DSQ_1M_6M_0115(path.to.data)
+specData_DS_1M_6M_0115_extraNoise(path.to.data)
 
-specData_DS_1M_6M_0115(path.to.data)
+specData_D_1M_6M_0115_extraNoise(path.to.data)
 
-specData_D_1M_6M_0115(path.to.data)
+spec_1FtoyModel_extraNoise(U)
 
-spec_3FsepIntModel()
+spec_3FsepIntModel_erp_extraNoise(U)
+
+spec_3FsepIntModel_erp_portfolio()
+
+specData_PF_DSQ_3Mat(path.to.data)
+}
+\arguments{
+\item{U}{number of observed pfolios}
 }
 \value{
 \code{model.spec} and \code{data.structure} objects
@@ -26,24 +35,32 @@ spec_3FsepIntModel()
 Functions which fix model and data specifications for estimation. These functions are not intended for use for the public. They might get separated from the package in the future and placed in a separate archive.
 }
 \details{
-\code{spec_1FtoyModel} Specifies a single-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides.
+\code{specData_DSQ_1M_6M_0115_extraNoise} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices.
 
-\code{specData_DSQ_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error varcov matrices.
+\code{specData_DS_1M_6M_0115_extraNoise} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 
-\code{specData_DS_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error varcov matrices. Excludes quarticity
+\code{specData_D_1M_6M_0115_extraNoise} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes skewness and quarticity
 
-\code{specData_D_1M_6M_0115} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error varcov matrices. Excludes skewness and quarticity
+\code{spec_1FtoyModel_extraNoise}  Specifies a single-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. There are variance parameters for observation noise.
 
-\code{spec_3FsepIntModel} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility
+\code{spec_3FsepIntModel_erp_extraNoise} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There are variance parameters for observation noise. Plus, there is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
+
+\code{spec_3FsepIntModel_erp} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
+
+\code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 }
 \section{Functions}{
 \itemize{
-\item \code{specData_DSQ_1M_6M_0115}: 
+\item \code{specData_DS_1M_6M_0115_extraNoise}: 
 
-\item \code{specData_DS_1M_6M_0115}: 
+\item \code{specData_D_1M_6M_0115_extraNoise}: 
 
-\item \code{specData_D_1M_6M_0115}: 
+\item \code{spec_1FtoyModel_extraNoise}: 
 
-\item \code{spec_3FsepIntModel}: 
+\item \code{spec_3FsepIntModel_erp_extraNoise}: 
+
+\item \code{spec_3FsepIntModel_erp_portfolio}: 
+
+\item \code{specData_PF_DSQ_3Mat}: 
 }}
 

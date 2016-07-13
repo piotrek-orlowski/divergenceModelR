@@ -15,6 +15,11 @@ affineObservationStateHandler_DS <- function(stateMat, modelParameters, iterCoun
 }
 
 #' @export
+affineObservationStateHandler_optionPortfolios <- function(stateMat, modelParameters, iterCount) {
+    .Call('divergenceModelR_affineObservationStateHandler_optionPortfolios', PACKAGE = 'divergenceModelR', stateMat, modelParameters, iterCount)
+}
+
+#' @export
 affineTransitionStateHandler <- function(stateMat, modelParameters, iterCount) {
     .Call('divergenceModelR_affineTransitionStateHandler', PACKAGE = 'divergenceModelR', stateMat, modelParameters, iterCount)
 }
@@ -45,11 +50,10 @@ divModelObsNoiseMat <- function(corrs, bpars, spotVar, matVec, U) {
 }
 
 #' @describeIn filterCaller
-#' @title C++ filter call
-#' @description This function wraps the ukfClass construction and exposes the call to R. Should not be used directly by the user, rather its exported R interface should be given as an argument to \code{\link{modelLikelihood}}
+#' @details \code{portfolio_sqrtFilter} works on whatever portfolios you supply
 #' @export
-DSQ_filter <- function(dataMat, initState, initProcCov, modelParams) {
-    .Call('divergenceModelR_DSQ_filter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
+portfolio_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {
+    .Call('divergenceModelR_portfolio_sqrtFilter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
 }
 
 #' @name filterCaller
@@ -73,6 +77,11 @@ D_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {
 #' @export
 DS_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {
     .Call('divergenceModelR_DS_sqrtFilter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
+}
+
+#'@export
+glPricer_cpp <- function(strikeMat, mkt, glWts, glNodes, cfVals, Nfactors, alpha = 0, sigmaRef = 1.0) {
+    .Call('divergenceModelR_glPricer_cpp', PACKAGE = 'divergenceModelR', strikeMat, mkt, glWts, glNodes, cfVals, Nfactors, alpha, sigmaRef)
 }
 
 #' @export

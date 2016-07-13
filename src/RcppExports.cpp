@@ -46,6 +46,19 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// affineObservationStateHandler_optionPortfolios
+Rcpp::List affineObservationStateHandler_optionPortfolios(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
+RcppExport SEXP divergenceModelR_affineObservationStateHandler_optionPortfolios(SEXP stateMatSEXP, SEXP modelParametersSEXP, SEXP iterCountSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::mat& >::type stateMat(stateMatSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type modelParameters(modelParametersSEXP);
+    Rcpp::traits::input_parameter< const int >::type iterCount(iterCountSEXP);
+    __result = Rcpp::wrap(affineObservationStateHandler_optionPortfolios(stateMat, modelParameters, iterCount));
+    return __result;
+END_RCPP
+}
 // affineTransitionStateHandler
 Rcpp::List affineTransitionStateHandler(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
 RcppExport SEXP divergenceModelR_affineTransitionStateHandler(SEXP stateMatSEXP, SEXP modelParametersSEXP, SEXP iterCountSEXP) {
@@ -126,9 +139,9 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// DSQ_filter
-List DSQ_filter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams);
-RcppExport SEXP divergenceModelR_DSQ_filter(SEXP dataMatSEXP, SEXP initStateSEXP, SEXP initProcCovSEXP, SEXP modelParamsSEXP) {
+// portfolio_sqrtFilter
+List portfolio_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams);
+RcppExport SEXP divergenceModelR_portfolio_sqrtFilter(SEXP dataMatSEXP, SEXP initStateSEXP, SEXP initProcCovSEXP, SEXP modelParamsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -136,7 +149,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::vec >::type initState(initStateSEXP);
     Rcpp::traits::input_parameter< const arma::mat >::type initProcCov(initProcCovSEXP);
     Rcpp::traits::input_parameter< const List >::type modelParams(modelParamsSEXP);
-    __result = Rcpp::wrap(DSQ_filter(dataMat, initState, initProcCov, modelParams));
+    __result = Rcpp::wrap(portfolio_sqrtFilter(dataMat, initState, initProcCov, modelParams));
     return __result;
 END_RCPP
 }
@@ -179,6 +192,24 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat >::type initProcCov(initProcCovSEXP);
     Rcpp::traits::input_parameter< const List >::type modelParams(modelParamsSEXP);
     __result = Rcpp::wrap(DS_sqrtFilter(dataMat, initState, initProcCov, modelParams));
+    return __result;
+END_RCPP
+}
+// glPricer_cpp
+arma::cube glPricer_cpp(const arma::cube& strikeMat, const arma::mat& mkt, const arma::vec& glWts, const arma::vec& glNodes, arma::cx_cube& cfVals, int Nfactors, double alpha, double sigmaRef);
+RcppExport SEXP divergenceModelR_glPricer_cpp(SEXP strikeMatSEXP, SEXP mktSEXP, SEXP glWtsSEXP, SEXP glNodesSEXP, SEXP cfValsSEXP, SEXP NfactorsSEXP, SEXP alphaSEXP, SEXP sigmaRefSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::cube& >::type strikeMat(strikeMatSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type mkt(mktSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type glWts(glWtsSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type glNodes(glNodesSEXP);
+    Rcpp::traits::input_parameter< arma::cx_cube& >::type cfVals(cfValsSEXP);
+    Rcpp::traits::input_parameter< int >::type Nfactors(NfactorsSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type sigmaRef(sigmaRefSEXP);
+    __result = Rcpp::wrap(glPricer_cpp(strikeMat, mkt, glWts, glNodes, cfVals, Nfactors, alpha, sigmaRef));
     return __result;
 END_RCPP
 }
