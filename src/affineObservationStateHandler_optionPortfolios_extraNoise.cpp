@@ -11,7 +11,7 @@ using namespace std;
 
 //' @export
 // [[Rcpp::export]]
-Rcpp::List affineObservationStateHandler_optionPortfolios(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount){
+Rcpp::List affineObservationStateHandler_optionPortfolios_extraNoise(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount){
 
   // In state mat, additionally, to state values, we carry the past filtered state
   // because it is necessary to calculate effects of stock return observation
@@ -19,22 +19,22 @@ Rcpp::List affineObservationStateHandler_optionPortfolios(const arma::mat& state
   
   // Grab stock parameters
   Rcpp::List stockParams = modelParameters["stockParams"];
-  
+
   // First handle the stock. The observation equation uses the beta of the stock
   // on volatility factors. The noise is the residual variance. First compute
   // expected stock returns at all states. Then calculate the betas at the
   // original state (stateMat.col(0).)
-  
+
   Rcpp::List stockParamsMeanVec = stockParams["mean.vec"];
   Rcpp::List stockMeanIndividual = Rcpp::List::create(stockParamsMeanVec[0]);
-  
+
   // Initialize a vector for stock means, length = number of states in evaluation
   arma::vec stockMeans(stateMat.n_cols);
   stockMeans.fill(0.0);
   
   // Calculate expected stock returns at previous state
   for(unsigned int kcol = 0; kcol < stateMat.n_cols; kcol++){
-  stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.submat(Nf,kcol,2*Nf-1,kcol)));
+    stockMeans(kcol) = arma::as_scalar(meanVecFun(stockMeanIndividual , stateMat.submat(Nf,kcol,2*Nf-1,kcol)));
   }
   
   // Start working on the covariance matrix between stock return and states.
@@ -118,18 +118,24 @@ Rcpp::List affineObservationStateHandler_optionPortfolios(const arma::mat& state
   arma::mat obsNoiseMat(1+W*T,1+W*T,arma::fill::zeros);
   //The stock ``observation'' noise is uncorrelated with portfolio observation noise.
   obsNoiseMat(0,0) = stockNoise(0,0);
-  
+
   // extract observation noise correlation matrix
   SEXP divBigMat_SEXP(modelParameters["divNoiseCube"]);
   arma::cube divBigMat = as<arma::cube>(divBigMat_SEXP);
   
-  // var-cov matrix scaling
   arma::vec errSdParVec = as<arma::vec>(modelParameters["errSdParVec"]);
-  
-  obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = errSdParVec(0) * divBigMat.slice(iterCount);
-  
+  double sumStates = arma::accu(stateMat.submat(0,0,Nf-1,0));
+  errSdParVec *= sumStates;
+  errSdParVec = arma::sqrt(errSdParVec);
+
+  // calculate noise variance-covariance matrix by multiplying the diagonal 
+  // matrices of noise standard deviation by the correlation matrix in the 
+  // middle. Then assign to the lower block of obsNoiseMat (everything except
+  // for 1st row and 1st col)
+  obsNoiseMat(arma::span(1,obsNoiseMat.n_rows-1),arma::span(1,obsNoiseMat.n_cols-1)) = arma::diagmat(errSdParVec) * divBigMat.slice(iterCount) * arma::diagmat(errSdParVec);
+
   // Initialize return list
   Rcpp::List res = Rcpp::List::create(Rcpp::Named("yhat") = yhat, Rcpp::Named("obsNoiseMat") = obsNoiseMat);
-  
+
   return res;
 }

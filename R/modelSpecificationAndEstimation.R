@@ -842,11 +842,33 @@ model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, fo
 #' @return \code{model_wrapLikelihood_portfolio_extraNoise} wraps the likelihood function with extra noise so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 #' @export
 
-model_wrapLikelihood_portfolio_extraNoise <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty, N.GL.points = 64){
+model_wrapLikelihood_portfolio_extraNoise <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty, N.GL.points = 64){
   
   retFoo <- function(par.vec){
     noise.par <- tail(par.vec,ncol(data.structure$obs.data)-1)
     par.vec <- head(par.vec,-(ncol(data.structure$obs.data)-1))
+    model.spec$noise.par <- noise.par
+    par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
+    model.spec$params.P <- par.list$P
+    model.spec$params.Q <- par.list$Q
+    
+    logLik <- model_Likelihood_portfolio_extraNoise(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized, penalty = penalty, N.GL.points = N.GL.points)
+    
+    return(logLik)
+  }
+  
+  return(retFoo)
+}
+
+#' @describeIn modLik
+#' @return \code{model_wrapLikelihood_portfolio} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
+#' @export
+
+model_wrapLikelihood_portfolio <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty, N.GL.points = 64){
+  
+  retFoo <- function(par.vec){
+    noise.par <- tail(par.vec,1)
+    par.vec <- head(par.vec,-1)
     model.spec$noise.par <- noise.par
     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
     model.spec$params.P <- par.list$P

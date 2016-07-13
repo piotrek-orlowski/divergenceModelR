@@ -23,7 +23,11 @@ ukfClass filterInstance(dataMat, initState, initProcCov, transitionPtr, observat
 filterInstance.filterSqrtAdditiveNoise();
 
 // Set return variable
-List res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL(), Named("predMat") = filterInstance.getPredMat());
+List res = List::create(Named("estimState") = filterInstance.getStateMat()
+                          , Named("stateCovCube") = filterInstance.getCovCube()
+                          , Named("logL") = filterInstance.getLogL()
+                          , Named("predMat") = filterInstance.getPredMat()
+                          , Named("fitMat") = filterInstance.getFitMat());
 
 return res;
 }
