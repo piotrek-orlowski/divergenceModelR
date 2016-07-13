@@ -6,13 +6,13 @@
 #' @return \code{evaluation_fittedPrices} returns a list with fields \code{obs} (the observed returns and swap prices) and \code{fit} (the predicted returns and fitted swap prices.)
 #' @export
 
-evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, handlerFoo = affineObservationStateHandler, N.points = 5){
+evaluation_fittedPrices <- function(par.vec, model_Likelihood = model_Likelihood, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, handlerFoo = affineObservationStateHandler, N.points = 5){
   if(is.null(par.vec) & is.null(par.list)){
     stop("No parameters supplied: both par.vec and par.list are NULL")
   }
   
   # Get parameters from vector into lists
-  par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
+  par.list <- model_translateParameters(par.vec = par.vec[1:length(model.spec$par.names)], par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
   model.spec$params.P <- par.list$P
   model.spec$params.Q <- par.list$Q
   
@@ -24,7 +24,7 @@ evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, mo
   
   sol.derivs <- Re(odeExtSolveWrap(u = cbind(unique(data.structure$spec.mat$p),matrix(0,nrow = length(unique(data.structure$spec.mat$p)), ncol = model.spec$N.factors)), params.P = NULL, params.Q = model.spec$params.Q, mkt = data.structure$mkt, jumpTransform = getPointerToJumpTransform(model.spec$jump.type), N.factors = model.spec$N.factors, mod.type = 'standard', rtol = 1e-12, atol = 1e-28))
   
-  obsParameters <- list(stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(1+model.spec$N.factors) ,diag = T)]), cfCoeffs = sol.derivs, tVec = data.structure$mkt$t, pVec = unique(data.structure$spec.mat$p), divNoiseCube = data.structure$noise.cov.cube)
+  obsParameters <- list(stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(1+model.spec$N.factors) ,diag = T)]), cfCoeffs = sol.derivs, tVec = data.structure$mkt$t, pVec = unique(data.structure$spec.mat$p), divNoiseCube = data.structure$noise.cov.cube, errSdParVec = model.spec$noise.par)
 
   swap.fit <- t(handlerFoo(stateMat = t(logLik$estimState[-1,,drop=F]), modelParameters = obsParameters, iterCount = 1)$yhat)
   
@@ -37,15 +37,15 @@ evaluation_fittedPrices <- function(par.vec, par.list = NULL, data.structure, mo
 #' @details \code{evaluation_plotting} plots the following: (1) time series of filtered factor values, (2) time series of fitted and observed swap rates, (3) Q-Q plots of filtered factors and bootstrap sample from the estimated model factors, (4) autocorrelation functions of pricing errors, (5)
 #' @return \code{evaluation_plotting} does not return.
 #' @export
-evaluation_plotting <- function(par.vec, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, handlerFoo = affineObservationStateHandler, N.points = 5, plot.path){
+evaluation_plotting <- function(par.vec, model_Likelihood= model_Likelihood, par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter, handlerFoo = affineObservationStateHandler, N.points = 5, plot.path){
   
   # par lists
-  par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, model.spec$N.factors)
+  par.list <- model_translateParameters(par.vec = par.vec[1:length(model.spec$par.names)], par.names = model.spec$par.names, par.restr = model.spec$par.restr, model.spec$N.factors)
   model.spec$params.P <- par.list$P
   model.spec$params.Q <- par.list$Q
   
   # fitted values
-  model.results <- evaluation_fittedPrices(par.vec = par.vec, par.list = par.list, data.structure = data.structure, model.spec = model.spec, filterFoo = filterFoo, N.points = N.points, handlerFoo = handlerFoo)
+  model.results <- evaluation_fittedPrices(par.vec = par.vec, model_Likelihood = model_Likelihood, par.list = par.list, data.structure = data.structure, model.spec = model.spec, filterFoo = filterFoo, N.points = N.points, handlerFoo = handlerFoo)
   
   fit <- model.results$fit
   

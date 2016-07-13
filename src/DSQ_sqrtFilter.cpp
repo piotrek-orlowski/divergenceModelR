@@ -25,7 +25,13 @@ List DSQ_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const ar
   filterInstance.filterSqrtAdditiveNoise();
   
   // Set return variable
-  List res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL(), Named("predMat") = filterInstance.getPredMat());
+  List res = List::create(
+    Named("estimState") = filterInstance.getStateMat()
+    , Named("stateCovCube") = filterInstance.getCovCube()
+    , Named("logL") = filterInstance.getLogL()
+    , Named("predMat") = filterInstance.getPredMat()
+    , Named("fitMat") = filterInstance.getFitMat()
+  );
   
   return res;
 }
@@ -48,7 +54,13 @@ List D_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma
   filterInstance.filterSqrtAdditiveNoise();
   
   // Set return variable
-  List res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL());
+  List res = List::create(
+    Named("estimState") = filterInstance.getStateMat()
+    , Named("stateCovCube") = filterInstance.getCovCube()
+    , Named("logL") = filterInstance.getLogL()
+    , Named("predMat") = filterInstance.getPredMat()
+    , Named("fitMat") = filterInstance.getFitMat()
+  );
   
   return res;
 }
@@ -71,7 +83,13 @@ List DS_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arm
   filterInstance.filterSqrtAdditiveNoise();
   
   // Set return variable
-  List res = List::create(Named("estimState") = filterInstance.getStateMat(), Named("stateCovCube") = filterInstance.getCovCube(), Named("logL") = filterInstance.getLogL());
+  List res = List::create(
+    Named("estimState") = filterInstance.getStateMat()
+    , Named("stateCovCube") = filterInstance.getCovCube()
+    , Named("logL") = filterInstance.getLogL()
+    , Named("predMat") = filterInstance.getPredMat()
+    , Named("fitMat") = filterInstance.getFitMat()
+  );
   
   return res;
 }

@@ -13,7 +13,8 @@ Depends: affineModelR,
 Imports: Rcpp,
          RcppArmadillo,
          tikzDevice,
-         tools
+         tools,
+         statmod
 LinkingTo: 
   Rcpp,
   RcppArmadillo,
