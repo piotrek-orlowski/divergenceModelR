@@ -9,193 +9,194 @@
 #' @param penalized \code{FALSE} by default, if \code{TRUE}, the Feller constraint is imposed as a penalty on the likelihood. Otherwise, infinity is returned (discontinuous at boundary).
 #' @return \code{model_Likelihood} if \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
 #' @details Not much for now
-#' @export
 
-model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12){
-  
-  # Extract some variables from model specification
-  N.factors <- model.spec$N.factors
-  params.P <- model.spec$params.P
-  params.Q <- model.spec$params.Q
-  jump.type <- model.spec$jump.type
-  time.dt <- data.structure$dt
-  mkt.spec <- data.structure$mkt
-  spec.mat <- data.structure$spec.mat
-  data.obs <- data.structure$obs.data
-  
-  # Test parameters for vol factor Feller conditions
-  feller.check <- model_fellerConditionCheck(params.P = params.P, params.Q = params.Q, N.factors = N.factors)
-  logl.penalty <- 0
-  if(!penalized){
-    if(!any(feller.check$p)){
-      print("P-measure Feller condition not met")
-      return(-1e15)
-    }
-    if(!any(feller.check$q)){
-      print("Q-measure Feller condition not met")
-      return(-1e15)
-    }
-  } else {
-    logl.penalty <- -penalty * sum( as.numeric(!feller.check$p) * pmin(0,feller.check$pval)^2 + as.numeric(!feller.check$q) * pmin(0, feller.check$qval)^2)
-  }
-  
-  # solve ODEs for pricing
-  ode.solutions <- tryCatch(
-        Re(odeExtSolveWrap(
-          u = cbind(unique(spec.mat[,"p"]),matrix(0,length(unique(spec.mat[,"p"])),N.factors)), 
-          params.Q = params.Q, 
-          mkt = mkt.spec, 
-          jumpTransform = getPointerToJumpTransform(jump.type), 
-          N.factors = N.factors, 
-          mod.type = 'standard', 
-          rtol = 1e-12, atol = 1e-28
-        ))
-      ,error = function(e){
-        print(e)
-        return(-1e15)
-        })
-  
-  # Calculate model dynamics coefficients
-  model.dynamics <- tryCatch(
-      modelDynamics(
-        params.P = params.P, 
-        params.Q = params.Q, 
-        dT = time.dt, 
-        N.factors = N.factors, 
-        jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
-        N.points = N.points,
-        mod.type = 'standard', 
-        rtol = 1e-12, 
-        atol = 1e-30
-      )
-    , error = function(e){
-      print(e)
-      return(-1e15)
-    })
-  
-  # Transition equation setup
-  vol.cov.array <- model.dynamics$cov.array[-1,-1]
-  transition.parameters <- list(
-        mean.vec = model.dynamics$mean.vec[-1], 
-        cov.array = vol.cov.array[lower.tri(matrix(0,N.factors,N.factors),diag = T)]
-      )
-  
-  # Observation equation setup
-  observation.parameters <- list(
-        stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(1+N.factors),diag = T)]), 
-        cfCoeffs = ode.solutions,
-        divNoiseCube = data.structure$noise.cov.cube,
-        tVec = mkt.spec$t, 
-        pVec = unique(spec.mat[,"p"])
-      )
-  
-  # Long-term means under Q
-  q.init.state <- matrix(0,nrow = 2, ncol = N.factors)
-  for(kk in 1:N.factors){
-    deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
-    deriv.u[2,kk+1] <- 1e-5
-    init.state.loc <- tryCatch(affineCF(
-      u = deriv.u, 
-      params.Q = params.Q, 
-      params.P = NULL, 
-      t.vec = 2, 
-      v.0 = matrix(1,nrow=1,ncol=N.factors), 
-      jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
-      N.factors = N.factors, 
-      CGF = FALSE, 
-      mod.type = 'standard', 
-      atol = 1e-12, 
-      rtol = 1e-10
-    ),
-    error = function(e){
-      print(e)
-      return(-1e15)
-    })
-    q.init.state[,kk] <- drop(init.state.loc)
-  }
-  
-  q.init.state <- drop(q.init.state)
-  if(is.null(dim(q.init.state))){
-    q.init.state <- matrix(q.init.state,ncol=1)
-  }
-  q.init.state <- 1e5 * (q.init.state[2,]-q.init.state[1,])
-  q.init.state <- Re(matrix(rep(q.init.state,2), ncol = 1))
-  q.init.state[which(is.infinite(q.init.state))] <- 100.0
-  
-  # Initial state values -- long-term means under P
-  init.state <- matrix(0,nrow = 2, ncol = N.factors)
-  for(kk in 1:N.factors){
-    deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
-    deriv.u[2,kk+1] <- 1e-5
-    init.state.loc <- tryCatch(affineCF(
-      u = deriv.u, 
-      params.Q = params.Q, 
-      params.P = params.P, 
-      t.vec = 2, 
-      v.0 = matrix(1,nrow=1,ncol=N.factors), 
-      jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
-      N.factors = N.factors, 
-      CGF = FALSE, 
-      mod.type = 'standard', 
-      atol = 1e-12, 
-      rtol = 1e-10
-    ),
-    error = function(e){
-      print(e)
-      return(-1e15)
-    })
-    init.state[,kk] <- drop(init.state.loc)
-  }
-  
-  init.state <- drop(init.state)
-  if(is.null(dim(init.state))){
-    init.state <- matrix(init.state,ncol=1)
-  }
-  init.state <- 1e5 * (init.state[2,]-init.state[1,])
-  init.state <- Re(matrix(rep(init.state,2), ncol = 1))
-  
-  # check stationarity under P and Q (approximate)
-  eta.P <- unlist(sapply(params.P,function(x) x$eta))
-  eta.Q <- unlist(sapply(params.Q,function(x) x$eta))
-  stat.penalty <- 0
-  stat.penalty <- as.numeric(init.state[1:N.factors]/eta.P >= 10) * pmax(0, init.state[1:N.factors]/eta.P - 10)^2
-  stat.penalty <- c(stat.penalty, as.numeric(q.init.state[1:N.factors]/eta.Q >= 10) * pmax(0, q.init.state[1:N.factors]/eta.Q - 10)^2)
-  stat.penalty <- -penalty * sum(stat.penalty)
-  logl.penalty <- logl.penalty + stat.penalty
+#  model_Likelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12){
+#   
+#   # Extract some variables from model specification
+#   N.factors <- model.spec$N.factors
+#   params.P <- model.spec$params.P
+#   params.Q <- model.spec$params.Q
+#   jump.type <- model.spec$jump.type
+#   time.dt <- data.structure$dt
+#   mkt.spec <- data.structure$mkt
+#   spec.mat <- data.structure$spec.mat
+#   data.obs <- data.structure$obs.data
+#   
+#   # Test parameters for vol factor Feller conditions
+#   feller.check <- model_fellerConditionCheck(params.P = params.P, params.Q = params.Q, N.factors = N.factors)
+#   logl.penalty <- 0
+#   if(!penalized){
+#     if(!any(feller.check$p)){
+#       print("P-measure Feller condition not met")
+#       return(-1e15)
+#     }
+#     if(!any(feller.check$q)){
+#       print("Q-measure Feller condition not met")
+#       return(-1e15)
+#     }
+#   } else {
+#     logl.penalty <- -penalty * sum( as.numeric(!feller.check$p) * pmin(0,feller.check$pval)^2 + as.numeric(!feller.check$q) * pmin(0, feller.check$qval)^2)
+#   }
+#   
+#   # solve ODEs for pricing
+#   ode.solutions <- tryCatch(
+#         Re(odeExtSolveWrap(
+#           u = cbind(unique(spec.mat[,"p"]),matrix(0,length(unique(spec.mat[,"p"])),N.factors)), 
+#           params.Q = params.Q, 
+#           mkt = mkt.spec, 
+#           jumpTransform = getPointerToJumpTransform(jump.type), 
+#           N.factors = N.factors, 
+#           mod.type = 'standard', 
+#           rtol = 1e-12, atol = 1e-28
+#         ))
+#       ,error = function(e){
+#         print(e)
+#         return(-1e15)
+#         })
+#   
+#   # Calculate model dynamics coefficients
+#   model.dynamics <- tryCatch(
+#       modelDynamics(
+#         params.P = params.P, 
+#         params.Q = params.Q, 
+#         dT = time.dt, 
+#         N.factors = N.factors, 
+#         jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
+#         N.points = N.points,
+#         mod.type = 'standard', 
+#         rtol = 1e-12, 
+#         atol = 1e-30
+#       )
+#     , error = function(e){
+#       print(e)
+#       return(-1e15)
+#     })
+#   
+#   # Transition equation setup
+#   vol.cov.array <- model.dynamics$cov.array[-1,-1]
+#   transition.parameters <- list(
+#         mean.vec = model.dynamics$mean.vec[-1], 
+#         cov.array = vol.cov.array[lower.tri(matrix(0,N.factors,N.factors),diag = T)]
+#       )
+#   
+#   # Observation equation setup
+#   observation.parameters <- list(
+#         stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(1+N.factors),diag = T)]), 
+#         cfCoeffs = ode.solutions,
+#         divNoiseCube = data.structure$noise.cov.cube,
+#         tVec = mkt.spec$t, 
+#         pVec = unique(spec.mat[,"p"])
+#       )
+#   
+#   # Long-term means under Q
+#   q.init.state <- matrix(0,nrow = 2, ncol = N.factors)
+#   for(kk in 1:N.factors){
+#     deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
+#     deriv.u[2,kk+1] <- 1e-5
+#     init.state.loc <- tryCatch(affineCF(
+#       u = deriv.u, 
+#       params.Q = params.Q, 
+#       params.P = NULL, 
+#       t.vec = 2, 
+#       v.0 = matrix(1,nrow=1,ncol=N.factors), 
+#       jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
+#       N.factors = N.factors, 
+#       CGF = FALSE, 
+#       mod.type = 'standard', 
+#       atol = 1e-12, 
+#       rtol = 1e-10
+#     ),
+#     error = function(e){
+#       print(e)
+#       return(-1e15)
+#     })
+#     q.init.state[,kk] <- drop(init.state.loc)
+#   }
+#   
+#   q.init.state <- drop(q.init.state)
+#   if(is.null(dim(q.init.state))){
+#     q.init.state <- matrix(q.init.state,ncol=1)
+#   }
+#   q.init.state <- 1e5 * (q.init.state[2,]-q.init.state[1,])
+#   q.init.state <- Re(matrix(rep(q.init.state,2), ncol = 1))
+#   q.init.state[which(is.infinite(q.init.state))] <- 100.0
+#   
+#   # Initial state values -- long-term means under P
+#   init.state <- matrix(0,nrow = 2, ncol = N.factors)
+#   for(kk in 1:N.factors){
+#     deriv.u <- matrix(0,nrow=2,ncol = N.factors+1)
+#     deriv.u[2,kk+1] <- 1e-5
+#     init.state.loc <- tryCatch(affineCF(
+#       u = deriv.u, 
+#       params.Q = params.Q, 
+#       params.P = params.P, 
+#       t.vec = 2, 
+#       v.0 = matrix(1,nrow=1,ncol=N.factors), 
+#       jumpTransform = getPointerToJumpTransform(jump.type)$TF, 
+#       N.factors = N.factors, 
+#       CGF = FALSE, 
+#       mod.type = 'standard', 
+#       atol = 1e-12, 
+#       rtol = 1e-10
+#     ),
+#     error = function(e){
+#       print(e)
+#       return(-1e15)
+#     })
+#     init.state[,kk] <- drop(init.state.loc)
+#   }
+#   
+#   init.state <- drop(init.state)
+#   if(is.null(dim(init.state))){
+#     init.state <- matrix(init.state,ncol=1)
+#   }
+#   init.state <- 1e5 * (init.state[2,]-init.state[1,])
+#   init.state <- Re(matrix(rep(init.state,2), ncol = 1))
+#   
+#   # check stationarity under P and Q (approximate)
+#   eta.P <- unlist(sapply(params.P,function(x) x$eta))
+#   eta.Q <- unlist(sapply(params.Q,function(x) x$eta))
+#   stat.penalty <- 0
+#   stat.penalty <- as.numeric(init.state[1:N.factors]/eta.P >= 10) * pmax(0, init.state[1:N.factors]/eta.P - 10)^2
+#   stat.penalty <- c(stat.penalty, as.numeric(q.init.state[1:N.factors]/eta.Q >= 10) * pmax(0, q.init.state[1:N.factors]/eta.Q - 10)^2)
+#   stat.penalty <- -penalty * sum(stat.penalty)
+#   logl.penalty <- logl.penalty + stat.penalty
+# 
+#   init.vol <- matrix(0,2*N.factors,2*N.factors)
+#   init.vol[1:N.factors,1:N.factors] <- covMatFun(
+#           covListS = vol.cov.array[lower.tri(x = diag(N.factors),diag = T)], 
+#           covListDim = c(N.factors,N.factors),  
+#           currVol = init.state[1:N.factors,1,drop=F]
+#         )
+#   
+#   filtering.result <- tryCatch(filterFoo(
+#         dataMat = data.obs, 
+#         initState = init.state, 
+#         initProcCov = init.vol, 
+#         modelParams = list(transition = transition.parameters, observation = observation.parameters)
+#       ),
+#         error = function(e) {
+#           print(e)
+#           list(logL = -1e15)
+#         }
+#       )
+#   
+#   if(for.estimation){
+#     return(sum(filtering.result$logL + logl.penalty))
+#   } else {
+#     return(filtering.result)
+#   }
+# }
 
-  init.vol <- matrix(0,2*N.factors,2*N.factors)
-  init.vol[1:N.factors,1:N.factors] <- covMatFun(
-          covListS = vol.cov.array[lower.tri(x = diag(N.factors),diag = T)], 
-          covListDim = c(N.factors,N.factors),  
-          currVol = init.state[1:N.factors,1,drop=F]
-        )
-  
-  filtering.result <- tryCatch(filterFoo(
-        dataMat = data.obs, 
-        initState = init.state, 
-        initProcCov = init.vol, 
-        modelParams = list(transition = transition.parameters, observation = observation.parameters)
-      ),
-        error = function(e) {
-          print(e)
-          list(logL = -1e15)
-        }
-      )
-  
-  if(for.estimation){
-    return(sum(filtering.result$logL + logl.penalty))
-  } else {
-    return(filtering.result)
-  }
-}
 
-#' @describeIn modLik
+
 #' @param par.vec vector with model parameter values
 #' @param par.names parameter names, character vector equal in length to par
 #' @param par.restr parameter equality restrictions, data.frame; par.vec and par.restr have to exhaust the model parameter set together.
 #' @param N.factors integer, number of SV factors
 #' @return \code{model_translateParameters} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
 #' @export
+
 model_translateParameters <- function(par.vec, par.names = names(par.vec), par.restr, N.factors){
   
   # Assign parameter names
@@ -341,6 +342,7 @@ model_translateParameters <- function(par.vec, par.names = names(par.vec), par.r
 #' @describeIn modLik
 #' @return \code{model_makeDefaultParameterStructures} returns \code{data.frame} \code{par.restr} and \code{character} vector \code{par.names}
 #' @export
+
 model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.",1:N.factors),paste0("Q$",1:N.factors,"$eta"))){
   
   # Fill in the basic constraints we agreed upon
@@ -383,24 +385,23 @@ model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$j
   return(list(par.names=names, par.restr = par.restr))
 }
 
-#' @describeIn modLik
-#' @return \code{model_wrapLikelihood} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
-#' @export
+# #' @return \code{model_wrapLikelihood} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
+# #' @export
 
-model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty){
-  
-  retFoo <- function(par.vec){
-    par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
-    model.spec$params.P <- par.list$P
-    model.spec$params.Q <- par.list$Q
-    
-    logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized, penalty = penalty)
-    
-    return(logLik)
-  }
- 
-  return(retFoo)
-}
+# model_wrapLikelihood <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty){
+# 
+#   retFoo <- function(par.vec){
+#     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
+#     model.spec$params.P <- par.list$P
+#     model.spec$params.Q <- par.list$Q
+# 
+#     logLik <- model_Likelihood(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized, penalty = penalty)
+# 
+#     return(logLik)
+#   }
+# 
+#   return(retFoo)
+# }
 
 #' @describeIn modLik
 #' @return \code{model_fellerConditionCheck} list with two logical vectors reporting whether the Feller conditions are satisfied
@@ -639,7 +640,7 @@ model_wrapLikelihood_extraNoise <- function(data.structure, model.spec, for.esti
 #' @return \code{model_Likelihood_portfolio_extraNoise} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
 #' @export
 
-model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12, N.GL.points = 64){
+model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12, N.GL.points = 96){
   
   # quadrature setup
   gl <- statmod::gauss.quad(n = N.GL.points, kind = "laguerre", alpha = 0)
@@ -839,32 +840,10 @@ model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, fo
 }
 
 #' @describeIn modLik
-#' @return \code{model_wrapLikelihood_portfolio_extraNoise} wraps the likelihood function with extra noise so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
-#' @export
-
-model_wrapLikelihood_portfolio_extraNoise <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty, N.GL.points = 64){
-  
-  retFoo <- function(par.vec){
-    noise.par <- tail(par.vec,ncol(data.structure$obs.data)-1)
-    par.vec <- head(par.vec,-(ncol(data.structure$obs.data)-1))
-    model.spec$noise.par <- noise.par
-    par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
-    model.spec$params.P <- par.list$P
-    model.spec$params.Q <- par.list$Q
-    
-    logLik <- model_Likelihood_portfolio_extraNoise(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized, penalty = penalty, N.GL.points = N.GL.points)
-    
-    return(logLik)
-  }
-  
-  return(retFoo)
-}
-
-#' @describeIn modLik
 #' @return \code{model_wrapLikelihood_portfolio} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 #' @export
 
-model_wrapLikelihood_portfolio <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty, N.GL.points = 64){
+model_wrapLikelihood_portfolio <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty, N.GL.points = 96){
   
   retFoo <- function(par.vec){
     noise.par <- tail(par.vec,1)
