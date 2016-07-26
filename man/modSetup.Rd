@@ -50,6 +50,8 @@ Functions which fix model and data specifications for estimation. These function
 
 \code{spec_3FsepIntModel_erp} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
 
+\code{spec_3FsepIntModel_smpl} specifies a three-factor model with minimalist erp form and two jump transforms: one for asset/vol, second for vol/intensity
+
 \code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 }
 

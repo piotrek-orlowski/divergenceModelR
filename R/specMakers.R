@@ -398,38 +398,35 @@ spec_3FsepIntModel_smpl <- function(){
   
   model.spec$scaleFoo <- function(par.vec){
     
-    par.vec[1] <- -0.3 + 0.6*par.vec[1]           # P$1$erp
-    par.vec[2] <- -0.3 + 0.6*par.vec[2]           # P$1$erp0
-    par.vec[3] <- 1e-2 + 16 * par.vec[3]          # P$1$kpp
-    # par.vec[4] <- 1e-4 + 4 * par.vec[4]           # P$1$lmb
+    par.vec[1] <- 0.0 + 0.1*par.vec[1]           # P$1$erp0
+    par.vec[2] <- 1e-2 + 16 * par.vec[2]          # P$1$kpp
+    par.vec[3] <- 1e-4 + 4 * par.vec[3]           # P$1$lmb
     par.vec[4] <- 1e-4 + 0.3 * par.vec[4]         # P$1$phi
     par.vec[5] <- -1 + 2*par.vec[5]               # P$1$rho
-    par.vec[6] <- -0.3 + 0.6 * par.vec[6]           # P$2$erp
-    par.vec[7] <- 1e-2 + 16 * par.vec[7]          # P$2$kpp
-    par.vec[8] <- 1e-4 + 4 * par.vec[8]         # P$2$lmb
-    par.vec[9] <- 1e-4 + 0.3 * par.vec[9]         # P$2$phi
-    par.vec[10] <- -1 + 2*par.vec[10]               # P$2$rho
-    par.vec[11] <- -0.3 + 0.6*par.vec[11]           # P$3$erp
-    par.vec[12] <- 1e-2 + 16 * par.vec[12]        # P$3$kpp
-    par.vec[13] <- 1e-4 + 4 * par.vec[13]         # P$3$lmb
-    par.vec[14] <- 1e-4 + 20 * par.vec[14]        # P$jmp$lprop.1
-    # par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lprop.2
-    par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lprop.3
-    par.vec[16] <- 1e-4 + 20 * par.vec[16]        # P$jmp$lvec
-    par.vec[17] <- 1+1/(1e-2 + par.vec[17])       # P$jmp$muSc
-    par.vec[18] <- -0.2 + 0.25 * par.vec[18]       # P$jmp$rhoc
-    par.vec[19] <- 1e-4 + 0.12 * par.vec[19]       # P$jmp$sigmaYc
+    par.vec[6] <- 1e-2 + 16 * par.vec[6]          # P$2$kpp
+    par.vec[7] <- 1e-4 + 4 * par.vec[7]         # P$2$lmb
+    # par.vec[9] <- 1e-4 + 0.3 * par.vec[9]         # P$2$phi
+    # par.vec[10] <- -1 + 2*par.vec[10]               # P$2$rho
+    # par.vec[11] <- -0.3 + 0.6*par.vec[11]           # P$3$erp
+    par.vec[8] <- 1e-2 + 16 * par.vec[8]        # P$3$kpp
+    par.vec[9] <- 1e-4 + 0.3 * par.vec[9]         # P$3$phi
+    # par.vec[13] <- 1e-4 + 4 * par.vec[13]         # P$3$lmb
+    par.vec[10] <- 1e-4 + 5 * par.vec[10]        # P$jmp$gammaProp
+    par.vec[11] <- 1e-4 + 20 * par.vec[11]        # P$jmp$lprop.2
+    # par.vec[15] <- 1e-4 + 20 * par.vec[15]        # P$jmp$lprop.3
+    par.vec[12] <- 1e-4 + 0.5 * par.vec[12]        # P$jmp$muInt
+    par.vec[13] <- 1e-4 + 0.2 * par.vec[13]        # P$jmp$muStock
+    par.vec[14] <- 1e-4 + 0.5 * par.vec[14]        # P$jmp$muVol
+    par.vec[15] <- 1e-4 + 0.5 * par.vec[15]        # P$jmp$muVol2
+    # par.vec[17] <- 1+1/(1e-2 + par.vec[17])       # P$jmp$muSc
+    par.vec[16] <- -0.2 + 0.25 * par.vec[16]       # P$jmp$rhoc
     #par.vec[20] <- 1e-2 + 2 * par.vec[20]         # Q$1$eta
-    par.vec[20] <- 1e-2 + 16 * par.vec[20]        # Q$1$kpp
-    par.vec[21] <- 1e-2 + 2 * par.vec[21]         # Q$2$eta
-    par.vec[22] <- 1e-2 + 16 * par.vec[22]        # Q$2$kpp
-    par.vec[23] <- 1e-2 + 16 * par.vec[23]         # Q$3$kpp
-    par.vec[24] <- 1e-4 + 20 * par.vec[24]        # Q$jmp$lprop.1
-    par.vec[25] <- 1+1/(1e-2 + par.vec[25])       # Q$jmp$muSc
-    par.vec[26] <- -0.2 + 0.25 * par.vec[26]       # Q$jmp$rhoc
-    par.vec[27] <- 1e-4 + 0.12 * par.vec[27]       # Q$jmp$sigmaYc
-    
-    par.vec[28] <- 5e2 + 5e3 * par.vec[28]      # noise covariance matrix scaling
+    par.vec[17] <- 1e-2 + 16 * par.vec[17]        # Q$1$kpp
+    par.vec[18] <- 1e-2 + 16 * par.vec[18]        # Q$2$kpp
+    par.vec[19] <- 1e-2 + 16 * par.vec[19]         # Q$3$kpp
+    par.vec[20] <- 1e-4 + 5 * par.vec[20]        # Q$jmp$gammaProp
+    par.vec[21] <- 1e-4 + 0.5 * par.vec[21]        # Q$jmp$muVol2
+    par.vec[22] <- -0.2 + 0.25 * par.vec[22]       # Q$jmp$rhoc
     
     return(par.vec)
   }
