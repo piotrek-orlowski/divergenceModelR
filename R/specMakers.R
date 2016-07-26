@@ -362,7 +362,7 @@ spec_3FsepIntModel_erp_portfolio <- function(){
 }
 
 #' @rdname modSetup
-#' @detals \code{spec_3FsepIntModel_smpl} specifies a three-factor model with minimalist erp form and two jump transforms: one for asset/vol, second for vol/intensity
+#' @details \code{spec_3FsepIntModel_smpl} specifies a three-factor model with minimalist erp form and two jump transforms: one for asset/vol, second for vol/intensity
 #' @export
 
 spec_3FsepIntModel_smpl <- function(){
