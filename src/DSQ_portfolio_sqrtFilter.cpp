@@ -5,7 +5,7 @@
 using namespace std;
 using namespace Rcpp;
 
-//' @describeIn filterCaller
+//' @rdname filterCaller
 //' @details \code{portfolio_sqrtFilter} works on whatever portfolios you supply
 //' @export
 //[[Rcpp::export]]

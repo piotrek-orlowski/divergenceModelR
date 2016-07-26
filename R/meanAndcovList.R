@@ -1,7 +1,7 @@
 #' @title Jump-diffusion model dynamics
 #' @description  This function creates mean and covariance structures that can be passed to linCombMean to combine into an estimate of the conditional first and second (cross-)moments of the stock return and volatility factors.
-#' @param params.P
-#' @param params.Q
+#' @param params.P parameter list
+#' @param params.Q parameter list risk-neutral
 #' @param dT The Time horizon
 #' @param rtol The relative tolerance required in the integration
 #' @param N.factors The number of stochastic vol factors assumed.

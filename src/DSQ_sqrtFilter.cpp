@@ -36,7 +36,7 @@ List DSQ_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const ar
   return res;
 }
 
-//' @describeIn filterCaller
+//' @rdname filterCaller
 //' @details \code{D_sqrtFilter} works on divergence
 //' @export
 //[[Rcpp::export]]
@@ -65,7 +65,7 @@ List D_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma
   return res;
 }
 
-//' @describeIn filterCaller
+//' @rdname filterCaller
 //' @details \code{DS_sqrtFilter} works on divergence
 //' @export
 //[[Rcpp::export]]

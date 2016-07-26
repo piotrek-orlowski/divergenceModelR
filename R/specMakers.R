@@ -38,7 +38,7 @@ specData_DSQ_1M_6M_0115_extraNoise <- function(path.to.data){
     ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
     return(ret.df)
   })
-  SP500_weekly <- rbind_all(SP500_weekly)
+  SP500_weekly <- bind_rows(SP500_weekly)
   SP500_weekly <- SP500_weekly %>% mutate(date = as.Date(date))  
   obs.data <- SP500_weekly %>% inner_join(obs.data, by = c("date"="day"))
   
@@ -56,7 +56,7 @@ specData_DSQ_1M_6M_0115_extraNoise <- function(path.to.data){
   return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
 }
 
-#' @describeIn modSetup
+#' @rdname modSetup
 #' @details \code{specData_DS_1M_6M_0115_extraNoise} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 #' @export
 specData_DS_1M_6M_0115_extraNoise <- function(path.to.data){
@@ -92,7 +92,7 @@ specData_DS_1M_6M_0115_extraNoise <- function(path.to.data){
     ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
     return(ret.df)
   })
-  SP500_weekly <- rbind_all(SP500_weekly)
+  SP500_weekly <- bind_rows(SP500_weekly)
   SP500_weekly <- SP500_weekly %>% mutate(date = as.Date(date))  
   obs.data <- SP500_weekly %>% inner_join(obs.data, by = c("date"="day"))
   
@@ -110,7 +110,7 @@ specData_DS_1M_6M_0115_extraNoise <- function(path.to.data){
   return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
 }
 
-#' @describeIn modSetup
+#' @rdname modSetup
 #' @details \code{specData_D_1M_6M_0115_extraNoise} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes skewness and quarticity
 #' @export
 
@@ -147,7 +147,7 @@ specData_D_1M_6M_0115_extraNoise <- function(path.to.data){
     ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
     return(ret.df)
   })
-  SP500_weekly <- rbind_all(SP500_weekly)
+  SP500_weekly <- bind_rows(SP500_weekly)
   SP500_weekly <- SP500_weekly %>% mutate(date = as.Date(date))  
   obs.data <- SP500_weekly %>% inner_join(obs.data, by = c("date"="day"))
   
@@ -165,7 +165,7 @@ specData_D_1M_6M_0115_extraNoise <- function(path.to.data){
   return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
 }
 
-#' @describeIn modSetup
+#' @rdname modSetup
 #' @details \code{spec_1FtoyModel_extraNoise}  Specifies a single-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. There are variance parameters for observation noise.
 #' @export
 
@@ -212,7 +212,7 @@ spec_1FtoyModel_extraNoise <- function(U){
   return(model.spec)
 }
 
-#' @describeIn modSetup
+#' @rdname modSetup
 #' @param U number of observed pfolios
 #' @details \code{spec_3FsepIntModel_erp_extraNoise} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There are variance parameters for observation noise. Plus, there is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
 #' @export
@@ -288,7 +288,7 @@ spec_3FsepIntModel_erp_extraNoise <- function(U){
   return(model.spec)  
 }
 
-#' @describeIn modSetup
+#' @rdname modSetup
 #' @details \code{spec_3FsepIntModel_erp} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
 #' @export
 
@@ -361,7 +361,7 @@ spec_3FsepIntModel_erp_portfolio <- function(){
   return(model.spec)  
 }
 
-# @describeIn modSetup
+# @rdname modSetup
 # @details \code{specData_DS_1M_6M_0115_cor_p0.0_p0.5} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 # @export
 
@@ -409,7 +409,7 @@ spec_3FsepIntModel_erp_portfolio <- function(){
 #     ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
 #     return(ret.df)
 #   })
-#   SP500_weekly <- rbind_all(SP500_weekly)
+#   SP500_weekly <- bind_rows(SP500_weekly)
 #   SP500_weekly <- SP500_weekly %>% mutate(date = as.Date(date))  
 #   obs.data <- SP500_weekly %>% inner_join(obs.data, by = c("date"="day"))
 #   
@@ -427,7 +427,7 @@ spec_3FsepIntModel_erp_portfolio <- function(){
 #   return(list(dt = dt, noise.cov.cube = noise.cov.cube, spec.mat = spec.mat, obs.data = as.matrix(obs.data[,-1]), dates = obs.data[,1], mkt = mkt))
 # }
 
-#' @describeIn modSetup
+#' @rdname modSetup
 #' @details \code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 #' @export
 specData_PF_DSQ_3Mat <- function(path.to.data){
@@ -455,7 +455,7 @@ specData_PF_DSQ_3Mat <- function(path.to.data){
     ret.df <- data.frame(date = x["end"], ret = prod(1 + loc.sp$ret)-1)
     return(ret.df)
   })
-  SP500_weekly <- rbind_all(SP500_weekly)
+  SP500_weekly <- bind_rows(SP500_weekly)
   SP500_weekly <- SP500_weekly %>% dplyr::mutate(date = as.Date(date))  
   obs.data <- SP500_weekly %>% dplyr::inner_join(obs.data, by = c("date"="day"))
   

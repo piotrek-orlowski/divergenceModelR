@@ -49,7 +49,7 @@ divModelObsNoiseMat <- function(corrs, bpars, spotVar, matVec, U) {
     .Call('divergenceModelR_divModelObsNoiseMat', PACKAGE = 'divergenceModelR', corrs, bpars, spotVar, matVec, U)
 }
 
-#' @describeIn filterCaller
+#' @rdname filterCaller
 #' @details \code{portfolio_sqrtFilter} works on whatever portfolios you supply
 #' @export
 portfolio_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {
@@ -65,14 +65,14 @@ DSQ_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {
     .Call('divergenceModelR_DSQ_sqrtFilter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
 }
 
-#' @describeIn filterCaller
+#' @rdname filterCaller
 #' @details \code{D_sqrtFilter} works on divergence
 #' @export
 D_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {
     .Call('divergenceModelR_D_sqrtFilter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
 }
 
-#' @describeIn filterCaller
+#' @rdname filterCaller
 #' @details \code{DS_sqrtFilter} works on divergence
 #' @export
 DS_sqrtFilter <- function(dataMat, initState, initProcCov, modelParams) {

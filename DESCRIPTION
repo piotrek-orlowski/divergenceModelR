@@ -5,18 +5,22 @@ Version: 0.0.1
 Date: 2016-02-05
 Author: Piotr Or{\l}owski, Andr{\'a}s Sali
 Maintainer: Piotr Or{\l}owski <piotrek.orlowski@gmail.com>
-Description: Pricing and estimation algorithms for affine jump diffusion models for divergence contracts (see Schneider and Trojani, ``Divergence and the Price of Uncertainty'')
+Description: Pricing and estimation algorithms for affine jump diffusion models
+    for divergence contracts (see Schneider and Trojani, ``Divergence and the Price
+    of Uncertainty'')
 License: GPL > 2.0?
-Depends: affineModelR,
-		 SparseGrid,
-		 ukfRcpp
-Imports: Rcpp,
-         RcppArmadillo,
-         tikzDevice,
-         tools,
-         statmod
-LinkingTo: 
-  Rcpp,
-  RcppArmadillo,
-  ukfRcpp,
-  affineModelR
+Depends:
+    affineModelR,
+    SparseGrid,
+    ukfRcpp
+Imports:
+    Rcpp,
+    RcppArmadillo,
+    tikzDevice,
+    tools,
+    statmod
+LinkingTo: Rcpp,
+    RcppArmadillo,
+    ukfRcpp,
+    affineModelR
+RoxygenNote: 5.0.1

@@ -33,7 +33,7 @@ evaluation_fittedPrices <- function(par.vec, model_Likelihood = model_Likelihood
   return(list(obs = data.structure$obs.data, fit = swap.fit[,-1], exp.ret = pred.ret, lik.object = logLik))
 }
 
-#' @describeIn modelEvaluation
+#' @rdname modelEvaluation
 #' @details \code{evaluation_plotting} plots the following: (1) time series of filtered factor values, (2) time series of fitted and observed swap rates, (3) Q-Q plots of filtered factors and bootstrap sample from the estimated model factors, (4) autocorrelation functions of pricing errors, (5)
 #' @return \code{evaluation_plotting} does not return.
 #' @export
@@ -98,7 +98,7 @@ evaluation_plotting <- function(par.vec, model_Likelihood= model_Likelihood, par
 #   
 }
 
-#' @describeIn modelEvaluation
+#' @rdname modelEvaluation
 #' @export
 evaluation_VCOVsandwich <- function(){
   

@@ -54,7 +54,7 @@ divergenceSwapRate <- function(p, params.Q, t.vec, vol.mat, jumpTransform = getP
 }
 
 #' @export skewSwapRate
-#' @describeIn divSwapRates
+#' @rdname divSwapRates
 
 skewSwapRate <- function(p, params.Q, t.vec, vol.mat, jumpTransform, mod.type, ...){
   
@@ -109,7 +109,7 @@ skewSwapRate <- function(p, params.Q, t.vec, vol.mat, jumpTransform, mod.type, .
   return(divSR)
 }
 
-#' @describeIn divSwapRates
+#' @rdname divSwapRates
 #' @export quartSwapRate
 
 quartSwapRate <- function(p, params.Q, t.vec, vol.mat, jumpTransform, mod.type,  ...){

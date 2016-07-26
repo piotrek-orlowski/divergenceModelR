@@ -24,7 +24,7 @@ priceVIX <- function(v.0, t.vec, params.Q, ...){
 }
 
 #' @export priceVIXFUT
-#' @describeIn vixfut
+#' @rdname  vixfut
 
 priceVIXFUT <- function(v.0, t, tau, params.Q, ...){
   

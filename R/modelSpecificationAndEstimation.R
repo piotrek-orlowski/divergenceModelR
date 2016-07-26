@@ -339,7 +339,7 @@ model_translateParameters <- function(par.vec, par.names = names(par.vec), par.r
   return(par.list)
 }
 
-#' @describeIn modLik
+#' @rdname modLik
 #' @return \code{model_makeDefaultParameterStructures} returns \code{data.frame} \code{par.restr} and \code{character} vector \code{par.names}
 #' @export
 
@@ -403,7 +403,7 @@ model_makeDefaultParameterStructures <- function(N.factors, pq.equality = c("Q$j
 #   return(retFoo)
 # }
 
-#' @describeIn modLik
+#' @rdname modLik
 #' @return \code{model_fellerConditionCheck} list with two logical vectors reporting whether the Feller conditions are satisfied
 #' @export
 model_fellerConditionCheck <- function(params.P, params.Q, N.factors){
@@ -424,7 +424,7 @@ model_fellerConditionCheck <- function(params.P, params.Q, N.factors){
   return(list(p=p,q=q,pval= pval, qval= qval))
 }
 
-#' @describeIn modLik
+#' @rdname modLik
 #' @param noisePar vector of noise variance magnitudes, equal to number of observed pfolios
 #' @return \code{model_Likelihood_extraNoise} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
 #' @export
@@ -613,7 +613,7 @@ model_Likelihood_extraNoise <- function(data.structure, model.spec, for.estimati
   }
 }
 
-#' @describeIn modLik
+#' @rdname modLik
 #' @return \code{model_wrapLikelihood_extraNoise} wraps the likelihood function with extra noise so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 #' @export
 
@@ -635,7 +635,7 @@ model_wrapLikelihood_extraNoise <- function(data.structure, model.spec, for.esti
   return(retFoo)
 }
 
-#' @describeIn modLik
+#' @rdname modLik
 #' @param noisePar vector of noise variance magnitudes, equal to number of observed pfolios
 #' @return \code{model_Likelihood_portfolio_extraNoise} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
 #' @export
@@ -839,7 +839,7 @@ model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, fo
   }
 }
 
-#' @describeIn modLik
+#' @rdname modLik
 #' @return \code{model_wrapLikelihood_portfolio} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 #' @export
 
