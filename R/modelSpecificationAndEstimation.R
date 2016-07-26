@@ -313,27 +313,27 @@ model_translateParameters <- function(par.vec, par.names = names(par.vec), par.r
   params.Q$jmp$lprop <- par.vec[which(grepl(pattern = "Q\\$jmp\\$lprop", names(par.vec)))]
   params.Q$jmp$lprop <- params.Q$jmp$lprop[order(names(params.Q$jmp$lprop))]
   
-  # Check if all P factor parameters are defined. They all have to be numeric.
-  svNames <- c("kpp","eta","lmb","rho","phi")
-  jmpNames <- c("lvec",paste0("lprop[",1:N.factors,"]"),"rhoc","muYc","sigmaYc","muSc")
-  
-  for(M in c("P","Q")){
-    for(pp in svNames){
-      for(fs in as.character(1:N.factors)){
-        if(!is.numeric(eval(parse(text = paste0("params.",M,"[[as.character(",fs,")]]$",pp))))){
-          stop(paste0("Error at parameter translation: parameter ", paste0(M,"$",fs,"$",pp) ," has non-numeric value"))
-        } 
-      }
-    }
-  }
-  
-  for(M in c("P","Q")){
-    for(pp in jmpNames){   
-      if(!is.numeric(eval(parse(text = paste0("params.",M,"$","jmp","$",pp))))){
-        stop(paste0("Error at parameter translation: parameter ", paste0(M,"$","jmp","$",pp) ," has non-numeric value"))
-      } 
-    }
-  }
+  # # Check if all P factor parameters are defined. They all have to be numeric.
+  # svNames <- c("kpp","eta","lmb","rho","phi")
+  # jmpNames <- c("lvec",paste0("lprop[",1:N.factors,"]"),"rhoc","muYc","sigmaYc","muSc")
+  # 
+  # for(M in c("P","Q")){
+  #   for(pp in svNames){
+  #     for(fs in as.character(1:N.factors)){
+  #       if(!is.numeric(eval(parse(text = paste0("params.",M,"[[as.character(",fs,")]]$",pp))))){
+  #         stop(paste0("Error at parameter translation: parameter ", paste0(M,"$",fs,"$",pp) ," has non-numeric value"))
+  #       } 
+  #     }
+  #   }
+  # }
+  # 
+  # for(M in c("P","Q")){
+  #   for(pp in jmpNames){   
+  #     if(!is.numeric(eval(parse(text = paste0("params.",M,"$","jmp","$",pp))))){
+  #       stop(paste0("Error at parameter translation: parameter ", paste0(M,"$","jmp","$",pp) ," has non-numeric value"))
+  #     } 
+  #   }
+  # }
   
   par.list <- list(P = params.P, Q = params.Q)
   return(par.list)

@@ -9,6 +9,7 @@
 \alias{spec_1FtoyModel_extraNoise}
 \alias{spec_3FsepIntModel_erp_extraNoise}
 \alias{spec_3FsepIntModel_erp_portfolio}
+\alias{spec_3FsepIntModel_smpl}
 \title{Model setup -- specification generators}
 \usage{
 specData_DSQ_1M_6M_0115_extraNoise(path.to.data)
@@ -22,6 +23,8 @@ spec_1FtoyModel_extraNoise(U)
 spec_3FsepIntModel_erp_extraNoise(U)
 
 spec_3FsepIntModel_erp_portfolio()
+
+spec_3FsepIntModel_smpl()
 
 specData_PF_DSQ_3Mat(path.to.data)
 }
