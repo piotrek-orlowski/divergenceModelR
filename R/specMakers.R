@@ -368,7 +368,7 @@ spec_3FsepIntModel_erp_portfolio <- function(){
 spec_3FsepIntModel_smpl <- function(){
   
   N.factors <- 3
-  model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.",c(1:3)),paste0("Q$",c(1,2,3),"$eta"),"Q$jmp$muVol","Q$jmp$muInt"))
+  model.spec <- model_makeDefaultParameterStructures(N.factors = N.factors, pq.equality = c("Q$jmp$lvec",paste0("Q$jmp$lprop.",c(1:3)),paste0("Q$",c(1,2,3),"$eta"),"Q$jmp$muVol","Q$jmp$muInt","Q$jmp$muStock"))
   model.spec$par.names <- model.spec$par.names[-which(grepl("P.2.phi",model.spec$par.names))]
   model.spec$par.restr <- rbind(data.frame(par.name = "P$2$phi", par.value = 0),model.spec$par.restr)
   model.spec$par.names <- model.spec$par.names[-which(grepl("P.2.rho",model.spec$par.names))]
@@ -428,6 +428,7 @@ spec_3FsepIntModel_smpl <- function(){
     par.vec[21] <- 1e-4 + 0.5 * par.vec[21]        # Q$jmp$muVol2
     par.vec[22] <- -0.2 + 0.25 * par.vec[22]       # Q$jmp$rhoc
     
+    par.vec <- c(par.vec,1) # add that for handling the noisematrix in stateHandler
     return(par.vec)
   }
   
