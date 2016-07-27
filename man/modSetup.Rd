@@ -6,9 +6,11 @@
 \alias{specData_DS_1M_6M_0115_extraNoise}
 \alias{specData_D_1M_6M_0115_extraNoise}
 \alias{specData_PF_DSQ_3Mat}
+\alias{specData_PF_D_3Mat}
 \alias{spec_1FtoyModel_extraNoise}
 \alias{spec_3FsepIntModel_erp_extraNoise}
 \alias{spec_3FsepIntModel_erp_portfolio}
+\alias{spec_3FsepIntModel_portfolio_DJ}
 \alias{spec_3FsepIntModel_smpl}
 \title{Model setup -- specification generators}
 \usage{
@@ -22,11 +24,15 @@ spec_1FtoyModel_extraNoise(U)
 
 spec_3FsepIntModel_erp_extraNoise(U)
 
+spec_3FsepIntModel_portfolio_DJ()
+
 spec_3FsepIntModel_erp_portfolio()
 
 spec_3FsepIntModel_smpl()
 
 specData_PF_DSQ_3Mat(path.to.data)
+
+specData_PF_D_3Mat(path.to.data)
 }
 \arguments{
 \item{U}{number of observed pfolios}
@@ -48,10 +54,14 @@ Functions which fix model and data specifications for estimation. These function
 
 \code{spec_3FsepIntModel_erp_extraNoise} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There are variance parameters for observation noise. Plus, there is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
 
+\code{spec_3FsepIntModel_portfolio_DJ} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
+
 \code{spec_3FsepIntModel_erp} Specifies a three-factor model with leverage effect, exponential jumps in volatility and correlated double exponential jumps in the underlying, with same tail parameter on both sides. One of the factors only drives jump intensity, not the continuous volatility. There is a more flexible parametrisation of the equity risk premium parameters, with some Q parameters restricted. Finally, the first vol factor has pure-jump dynamics
 
 \code{spec_3FsepIntModel_smpl} specifies a three-factor model with minimalist erp form and two jump transforms: one for asset/vol, second for vol/intensity
 
-\code{specData_DS_1M_6M_0115_cor} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
+\code{specData_DSQ_3Mat} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
+
+\code{specData_PF_D_3Mat} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Only divergence portfolios are taken. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 }
 
