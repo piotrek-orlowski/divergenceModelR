@@ -676,7 +676,7 @@ model_Likelihood_portfolio_extraNoise <- function(data.structure, model.spec, fo
   # collate maturities into mkt.spec
   mkt.spec <- do.call(what = rbind, args = mkt.list)
   mkt.spec <- cbind(t = unique(mkt.spec[,"t"]), r = 0, q = 0, p = 0)
-  mkt.spec <- mkt.spec[order(mkt.spec[,"t"]),]
+  mkt.spec <- mkt.spec[order(mkt.spec[,"t"]),,drop=FALSE]
 
   # solve ODEs for pricing
   ode.solutions <- tryCatch(
