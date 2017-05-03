@@ -2,8 +2,8 @@
 % Please edit documentation in R/divergencePricing.R
 \name{divergenceSwapRate}
 \alias{divergenceSwapRate}
-\alias{quartSwapRate}
 \alias{skewSwapRate}
+\alias{quartSwapRate}
 \title{Divergence pricing}
 \usage{
 divergenceSwapRate(p, params.Q, t.vec, vol.mat,
@@ -31,4 +31,3 @@ S x T matrix of divergence swap prices
 \description{
 Calculation of prices of divergence swaps, divergence-based skewness and kurtosis swaps. All swaps are scale-free, that is they are swaps on the return. The \code{_base} functions calculate prices of components: unscaled divergence, unscaled \eqn{x^p \log{x}} divergence, unscaled \eqn{x^p \log^2{x}} divergence.
 }
-

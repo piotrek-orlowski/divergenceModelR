@@ -29,4 +29,3 @@ Returns the value (unconditional P expectation) of the specified product.
 \description{
 This function calculates the general iterative moment condition that can be used for moment based model calibration. Futures prices (with some long expiry) are assumed for the stock!
 }
-

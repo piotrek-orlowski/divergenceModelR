@@ -21,4 +21,3 @@ A usual structure list
 \description{
 Create condition structure for hedged option return
 }
-

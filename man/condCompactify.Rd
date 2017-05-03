@@ -17,4 +17,3 @@ List with named elements, \code{cond.list} is a list akin to the input list, \co
 \description{
 This function takes a list of moment-condition defining data frames and a vector of corresponding coefficients, equal in length to the list. The data frame list is searched for identical entries, which are made unique, and the corresponding coefficients are summed.
 }
-

@@ -17,4 +17,3 @@ Returns a regularized condition list.
 \description{
 This function takes a condition list and fills it up the missing columns with 0s.
 }
-

@@ -32,4 +32,3 @@ Returns 2 lists and a matrix.
 \description{
 This function creates mean and covariance structures that can be passed to linCombMean to combine into an estimate of the conditional first and second (cross-)moments of the stock return and volatility factors.
 }
-

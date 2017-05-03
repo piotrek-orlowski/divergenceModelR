@@ -25,4 +25,3 @@ Given the parameters and initial values, this function produces the term structu
 \references{
 Ait-Sahalia, Y. and Karaman, M., and Mancini, L., ``The Term Structure of Variance Risk Premia and the Expectation Hypothesis''
 }
-

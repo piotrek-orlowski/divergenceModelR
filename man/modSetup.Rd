@@ -5,13 +5,13 @@
 \alias{specData_DSQ_1M_6M_0115_extraNoise}
 \alias{specData_DS_1M_6M_0115_extraNoise}
 \alias{specData_D_1M_6M_0115_extraNoise}
-\alias{specData_PF_DSQ_3Mat}
-\alias{specData_PF_D_3Mat}
 \alias{spec_1FtoyModel_extraNoise}
 \alias{spec_3FsepIntModel_erp_extraNoise}
-\alias{spec_3FsepIntModel_erp_portfolio}
 \alias{spec_3FsepIntModel_portfolio_DJ}
+\alias{spec_3FsepIntModel_erp_portfolio}
 \alias{spec_3FsepIntModel_smpl}
+\alias{specData_PF_DSQ_3Mat}
+\alias{specData_PF_D_3Mat}
 \title{Model setup -- specification generators}
 \usage{
 specData_DSQ_1M_6M_0115_extraNoise(path.to.data)
@@ -64,4 +64,3 @@ Functions which fix model and data specifications for estimation. These function
 
 \code{specData_PF_D_3Mat} returns loads the divergence sample from 2001 to 2015, p= 0.5, maturities 1/12 and 1/2 years. Only divergence portfolios are taken. Includes SP500 returns from OMTR and the bootstrapped error correlation matrices. Excludes quarticity
 }
-

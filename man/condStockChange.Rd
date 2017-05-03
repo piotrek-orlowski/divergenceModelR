@@ -15,4 +15,3 @@ A standard cond struct list
 \description{
 Return condition list for stock return
 }
-

@@ -2,12 +2,12 @@
 % Please edit documentation in R/modelSpecificationAndEstimation.R
 \name{modLik}
 \alias{modLik}
-\alias{model_Likelihood_extraNoise}
-\alias{model_Likelihood_portfolio_extraNoise}
-\alias{model_fellerConditionCheck}
-\alias{model_makeDefaultParameterStructures}
 \alias{model_translateParameters}
+\alias{model_makeDefaultParameterStructures}
+\alias{model_fellerConditionCheck}
+\alias{model_Likelihood_extraNoise}
 \alias{model_wrapLikelihood_extraNoise}
+\alias{model_Likelihood_portfolio_extraNoise}
 \alias{model_wrapLikelihood_portfolio}
 \title{Affine model likelihood based on divergence prices}
 \usage{
@@ -85,4 +85,3 @@ Functions for preparing model specification, evaluating the likelihood for the D
 \details{
 Not much for now
 }
-

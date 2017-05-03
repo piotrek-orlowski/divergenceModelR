@@ -24,4 +24,3 @@ List with named elements, \code{cond.list} is a list akin to the input lists, \c
 \description{
 This function takes two data frame lists which define elements of moment conditions, and two vectors of corresponding linear combination coefficients, and combines them into a single list of data frames which would result from multiplying the two expressions rational in GLT-portfolios.
 }
-

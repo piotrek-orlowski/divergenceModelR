@@ -24,4 +24,3 @@ return.df.list List with two fields: cond.list describing the moment conditions 
 \description{
 Generate list of data frames that describes a sum of hedged GLT portfolio returns or their squares.
 }
-
