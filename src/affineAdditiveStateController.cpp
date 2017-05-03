@@ -9,7 +9,7 @@ arma::mat affineAdditiveStateController(arma::mat stateMat){
   
   // set
   if(nonPosElements.n_elem > 0){
-    stateMat.elem(nonPosElements).fill(1e-2);
+    stateMat.elem(nonPosElements).fill(1e-6);
   }
   
   return stateMat;
