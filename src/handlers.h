@@ -12,4 +12,6 @@ Rcpp::List affineTransitionStateHandler(const arma::mat& stateMat, const Rcpp::L
 
 Rcpp::List affineObservationStateHandler_optionPortfolios(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
 
+Rcpp::List affineObservationStateHandler_optionPortfolios_noStock(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
+
 #endif
