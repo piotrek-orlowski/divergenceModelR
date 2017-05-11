@@ -20,6 +20,11 @@ affineObservationStateHandler_optionPortfolios <- function(stateMat, modelParame
 }
 
 #' @export
+affineObservationStateHandler_optionPortfolios_noStock <- function(stateMat, modelParameters, iterCount) {
+    .Call('divergenceModelR_affineObservationStateHandler_optionPortfolios_noStock', PACKAGE = 'divergenceModelR', stateMat, modelParameters, iterCount)
+}
+
+#' @export
 affineTransitionStateHandler <- function(stateMat, modelParameters, iterCount) {
     .Call('divergenceModelR_affineTransitionStateHandler', PACKAGE = 'divergenceModelR', stateMat, modelParameters, iterCount)
 }

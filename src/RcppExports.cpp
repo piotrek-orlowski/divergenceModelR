@@ -59,6 +59,19 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// affineObservationStateHandler_optionPortfolios_noStock
+Rcpp::List affineObservationStateHandler_optionPortfolios_noStock(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
+RcppExport SEXP divergenceModelR_affineObservationStateHandler_optionPortfolios_noStock(SEXP stateMatSEXP, SEXP modelParametersSEXP, SEXP iterCountSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::mat& >::type stateMat(stateMatSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type modelParameters(modelParametersSEXP);
+    Rcpp::traits::input_parameter< const int >::type iterCount(iterCountSEXP);
+    __result = Rcpp::wrap(affineObservationStateHandler_optionPortfolios_noStock(stateMat, modelParameters, iterCount));
+    return __result;
+END_RCPP
+}
 // affineTransitionStateHandler
 Rcpp::List affineTransitionStateHandler(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
 RcppExport SEXP divergenceModelR_affineTransitionStateHandler(SEXP stateMatSEXP, SEXP modelParametersSEXP, SEXP iterCountSEXP) {
