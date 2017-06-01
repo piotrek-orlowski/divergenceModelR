@@ -32,6 +32,7 @@ List res = List::create(Named("estimState") = filterInstance.getStateMat()
 return res;
 }
 
+//' @export
 //[[Rcpp::export]]
 List portfolio_noStock_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams){
   

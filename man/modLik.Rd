@@ -9,6 +9,8 @@
 \alias{model_wrapLikelihood_extraNoise}
 \alias{model_Likelihood_portfolio_extraNoise}
 \alias{model_wrapLikelihood_portfolio}
+\alias{model_Likelihood_affineContract}
+\alias{model_wrapLikelihood_affineContract}
 \title{Affine model likelihood based on divergence prices}
 \usage{
 model_translateParameters(par.vec, par.names = names(par.vec), par.restr,
@@ -36,6 +38,15 @@ model_wrapLikelihood_portfolio(data.structure, model.spec,
   for.estimation = FALSE,
   filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5,
   penalized = FALSE, penalty, N.GL.points = 96)
+
+model_Likelihood_affineContract(data.structure, model.spec,
+  for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5,
+  penalized = FALSE, penalty = 1e+12)
+
+model_wrapLikelihood_affineContract(data.structure, model.spec,
+  for.estimation = FALSE,
+  filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5,
+  penalized = FALSE, penalty)
 }
 \arguments{
 \item{par.vec}{vector with model parameter values}
@@ -61,6 +72,8 @@ model_wrapLikelihood_portfolio(data.structure, model.spec,
 \item{noisePar}{vector of noise variance magnitudes, equal to number of observed pfolios}
 
 \item{noisePar}{vector of noise variance magnitudes, equal to number of observed pfolios}
+
+\item{noisePar}{vector of noise variance magnitudes, equal to number of observed pfolios}
 }
 \value{
 \code{model_Likelihood} if \code{for.estimation==TRUE}: log-likelihood value (NOT negative of...), else: list with filtering results
@@ -78,6 +91,10 @@ model_wrapLikelihood_portfolio(data.structure, model.spec,
 \code{model_Likelihood_portfolio_extraNoise} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
 
 \code{model_wrapLikelihood_portfolio} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
+
+\code{model_Likelihood_affineContracts} \code{list} with fields \code{P} and \code{Q}, input for all ODE calling functions.
+
+\code{model_wrapLikelihood_affineContract} wraps the likelihood function so that it only accepts a parameter vector argument -- use this for optimizers that do not allow passing extra arguments to the optimised function.
 }
 \description{
 Functions for preparing model specification, evaluating the likelihood for the DSQ filtering.

@@ -7,6 +7,20 @@
 
 using namespace Rcpp;
 
+// affineContract_sqrtFilter
+List affineContract_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams);
+RcppExport SEXP divergenceModelR_affineContract_sqrtFilter(SEXP dataMatSEXP, SEXP initStateSEXP, SEXP initProcCovSEXP, SEXP modelParamsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::mat >::type dataMat(dataMatSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type initState(initStateSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type initProcCov(initProcCovSEXP);
+    Rcpp::traits::input_parameter< const List >::type modelParams(modelParamsSEXP);
+    __result = Rcpp::wrap(affineContract_sqrtFilter(dataMat, initState, initProcCov, modelParams));
+    return __result;
+END_RCPP
+}
 // affineObservationStateHandler
 Rcpp::List affineObservationStateHandler(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
 RcppExport SEXP divergenceModelR_affineObservationStateHandler(SEXP stateMatSEXP, SEXP modelParametersSEXP, SEXP iterCountSEXP) {
@@ -43,6 +57,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::List& >::type modelParameters(modelParametersSEXP);
     Rcpp::traits::input_parameter< const int >::type iterCount(iterCountSEXP);
     __result = Rcpp::wrap(affineObservationStateHandler_DS(stateMat, modelParameters, iterCount));
+    return __result;
+END_RCPP
+}
+// affineObservationStateHandler_affineContracts
+Rcpp::List affineObservationStateHandler_affineContracts(const arma::mat& stateMat, const Rcpp::List& modelParameters, const int iterCount);
+RcppExport SEXP divergenceModelR_affineObservationStateHandler_affineContracts(SEXP stateMatSEXP, SEXP modelParametersSEXP, SEXP iterCountSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::mat& >::type stateMat(stateMatSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type modelParameters(modelParametersSEXP);
+    Rcpp::traits::input_parameter< const int >::type iterCount(iterCountSEXP);
+    __result = Rcpp::wrap(affineObservationStateHandler_affineContracts(stateMat, modelParameters, iterCount));
     return __result;
 END_RCPP
 }
@@ -163,6 +190,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat >::type initProcCov(initProcCovSEXP);
     Rcpp::traits::input_parameter< const List >::type modelParams(modelParamsSEXP);
     __result = Rcpp::wrap(portfolio_sqrtFilter(dataMat, initState, initProcCov, modelParams));
+    return __result;
+END_RCPP
+}
+// portfolio_noStock_sqrtFilter
+List portfolio_noStock_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams);
+RcppExport SEXP divergenceModelR_portfolio_noStock_sqrtFilter(SEXP dataMatSEXP, SEXP initStateSEXP, SEXP initProcCovSEXP, SEXP modelParamsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::mat >::type dataMat(dataMatSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type initState(initStateSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type initProcCov(initProcCovSEXP);
+    Rcpp::traits::input_parameter< const List >::type modelParams(modelParamsSEXP);
+    __result = Rcpp::wrap(portfolio_noStock_sqrtFilter(dataMat, initState, initProcCov, modelParams));
     return __result;
 END_RCPP
 }
