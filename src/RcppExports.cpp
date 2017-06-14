@@ -207,6 +207,20 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// portfolio_noStock_simpleFilter
+List portfolio_noStock_simpleFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams);
+RcppExport SEXP divergenceModelR_portfolio_noStock_simpleFilter(SEXP dataMatSEXP, SEXP initStateSEXP, SEXP initProcCovSEXP, SEXP modelParamsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const arma::mat >::type dataMat(dataMatSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type initState(initStateSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type initProcCov(initProcCovSEXP);
+    Rcpp::traits::input_parameter< const List >::type modelParams(modelParamsSEXP);
+    __result = Rcpp::wrap(portfolio_noStock_simpleFilter(dataMat, initState, initProcCov, modelParams));
+    return __result;
+END_RCPP
+}
 // DSQ_sqrtFilter
 List DSQ_sqrtFilter(const arma::mat dataMat, const arma::vec initState, const arma::mat initProcCov, const List modelParams);
 RcppExport SEXP divergenceModelR_DSQ_sqrtFilter(SEXP dataMatSEXP, SEXP initStateSEXP, SEXP initProcCovSEXP, SEXP modelParamsSEXP) {

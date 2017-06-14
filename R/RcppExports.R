@@ -78,6 +78,11 @@ portfolio_noStock_sqrtFilter <- function(dataMat, initState, initProcCov, modelP
     .Call('divergenceModelR_portfolio_noStock_sqrtFilter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
 }
 
+#' @export
+portfolio_noStock_simpleFilter <- function(dataMat, initState, initProcCov, modelParams) {
+    .Call('divergenceModelR_portfolio_noStock_simpleFilter', PACKAGE = 'divergenceModelR', dataMat, initState, initProcCov, modelParams)
+}
+
 #' @name filterCaller
 #' @title C++ filter call
 #' @description This function wraps the ukfClass construction and exposes the call to R. Should not be used directly by the user, rather its exported R interface should be given as an argument to \code{\link{modelLikelihood}}
