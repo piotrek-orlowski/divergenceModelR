@@ -41,18 +41,23 @@ Rcpp::List affineObservationStateHandler_affineContracts(const arma::mat& stateM
       loc_p_vec.fill(loc_p);
       arma::vec loc_t_vec(tVecUnique.n_elem);
       loc_t_vec.fill(loc_t);
-      arma::uvec which_p = find(loc_p == loc_p_vec);
-      arma::uvec which_t = find(loc_t == loc_t_vec);
+      arma::uvec which_p = find(loc_p_vec == pVecUnique);
+      arma::uvec which_t = find(loc_t_vec == tVecUnique);
+      // Rcout << "loc_p= " << loc_p << ", loc_t= " << loc_t << "\n";
+      // pVecUnique.print("pVecUnique");
+      // which_p.print("which_p");
+      // tVecUnique.print("tVecUnique");
+      // which_t.print("which_t");
       
       // pick and calculate necessary affine swap rate
-      double loc_div_price = divPrices(which_p(0),which_t(0),kcol);
-      double loc_skew_price = skewPrices(which_p(0),which_t(0),kcol);
+      double loc_div_price = divPrices(which_p(0L),which_t(0L),kcol);
+      double loc_skew_price = skewPrices(which_p(0L),which_t(0L),kcol);
       if(loc_p == 0.0){
         yhat(prow, kcol) = loc_div_price;
       } else if(loc_p == 1.0){
-        // not implemented yet
+        yhat(prow, kcol) = loc_skew_price/loc_div_price;
       } else {
-        yhat(prow, kcol) = (loc_skew_price - (1.0 - 2.0*loc_p)/(loc_p*(loc_p-1.0))*loc_div_price) / (loc_div_price + 1.0);
+        yhat(prow, kcol) = (loc_skew_price - (1.0 - 2.0*loc_p)/(loc_p*(loc_p-1.0))*loc_div_price) / (loc_div_price + 1.0/(loc_p*(loc_p-1.0)));
       }
     }
   }
