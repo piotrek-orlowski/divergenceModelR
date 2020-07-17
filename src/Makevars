@@ -1,5 +1,5 @@
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_LIBS += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lz -L$(HOME)/lib/R-4.0.0/affineModelR/libs -L$(HOME)/lib/R-4.0.0/ukfRcpp/libs -lukfRcpp -laffineModelR
+PKG_LIBS += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lz -L$(HOME)/lib/R-4.0.0/affineModelR/libs -L$(HOME)/lib/R-4.0.0/ukfRcpp/libs -lukfRcpp.so -laffineModelR.so
 PKG_CPPFLAGS= -fpermissive
 PKG_CXXFLAGS += -fpermissive -I$(HOME)/lib/R-4.0.0/ukfRcpp/libs/affineModelR/include -I$(HOME)/lib/R-4.0.0/ukfRcpp/libs/ukfRcpp/include
 PKG_CFLAGS= -fpermissive
