@@ -77,7 +77,7 @@ for(unsigned int kcol=0; kcol < stateMat.n_cols; kcol++){
   yhat(arma::span(0,T*W-1L),kcol) = tempPrices;
 }
 
-// Handle the noise covariance matrix. 
+// Handle the noise covariance matrix.
 // create observation noise variance-covariance
 arma::mat obsNoiseMat(W*T,W*T,arma::fill::zeros);
 

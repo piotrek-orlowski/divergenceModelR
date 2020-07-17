@@ -8,11 +8,13 @@
 \title{Affine model evaluation}
 \usage{
 evaluation_fittedPrices(par.vec, model_Likelihood = model_Likelihood,
-  par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter,
+  par.list = NULL, data.structure, model.spec,
+  filterFoo = DSQ_sqrtFilter,
   handlerFoo = affineObservationStateHandler, N.points = 5)
 
 evaluation_plotting(par.vec, model_Likelihood = model_Likelihood,
-  par.list = NULL, data.structure, model.spec, filterFoo = DSQ_sqrtFilter,
+  par.list = NULL, data.structure, model.spec,
+  filterFoo = DSQ_sqrtFilter,
   handlerFoo = affineObservationStateHandler, N.points = 5, plot.path)
 
 evaluation_VCOVsandwich()

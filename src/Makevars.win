@@ -1,8 +1,8 @@
 
 ## This assume that we can call Rscript to ask Rcpp about its locations
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_LIBS = $(shell $(R_HOME)/bin/Rscript.exe -e "Rcpp:::LdFlags()") $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -Lc:/Libs/R/affineModelR/libs/x64 -laffineModelR -Lc:/Libs/R/ukfRcpp/libs/x64 -lukfRcpp
-PKG_CXXFLAGS = -fpermissive -Ic:/Libs/R/affineModelR/include -Ic:/Libs/R/ukfRcpp/include 
+PKG_LIBS = $(shell $(R_HOME)/bin/Rscript.exe -e "Rcpp:::LdFlags()") $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -Lc:/piotr/R/win-library/3.5/affineModelR/libs/x64 -laffineModelR -Lc:/piotr/R/win-library/3.5/ukfRcpp/libs/x64 -lukfRcpp
+PKG_CXXFLAGS = -fpermissive -Ic:/piotr/R/win-library/3.5/affineModelR/include -Ic:/piotr/R/win-library/3.5/ukfRcpp/include 
 
-## -Ic:/Libs/R/transformOptionPricer/include
-##  -Lc:/Libs/R/transformOptionPricer/libs/x64 -ltransformOptionPricer
+## -Ic:/piotr/R/win-library/3.5/transformOptionPricer/include
+## -Lc:/piotr/R/win-library/3.5/transformOptionPricer/libs/x64 -ltransformOptionPricer

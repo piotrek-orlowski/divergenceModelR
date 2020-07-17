@@ -4,8 +4,8 @@
 \alias{modelDynamics}
 \title{Jump-diffusion model dynamics}
 \usage{
-modelDynamics(params.P, params.Q, dT = 5/252, rtol = 1e-14, N.factors = 3,
-  N.points = 2,
+modelDynamics(params.P, params.Q, dT = 5/252, rtol = 1e-14,
+  N.factors = 3, N.points = 2,
   jumpTransform = getPointerToJumpTransform("expNormJumpTransform")$TF,
   mod.type = "standard", ...)
 }

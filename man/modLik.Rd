@@ -16,8 +16,9 @@
 model_translateParameters(par.vec, par.names = names(par.vec), par.restr,
   N.factors)
 
-model_makeDefaultParameterStructures(N.factors, pq.equality = c("Q$jmp$lvec",
-  paste0("Q$jmp$lprop.", 1:N.factors), paste0("Q$", 1:N.factors, "$eta")))
+model_makeDefaultParameterStructures(N.factors,
+  pq.equality = c("Q$jmp$lvec", paste0("Q$jmp$lprop.", 1:N.factors),
+  paste0("Q$", 1:N.factors, "$eta")))
 
 model_fellerConditionCheck(params.P, params.Q, N.factors)
 

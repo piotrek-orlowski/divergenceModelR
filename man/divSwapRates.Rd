@@ -7,8 +7,8 @@
 \title{Divergence pricing}
 \usage{
 divergenceSwapRate(p, params.Q, t.vec, vol.mat,
-  jumpTransform = getPointerToJumpTransform("expNormJumpTransform"), mod.type,
-  ...)
+  jumpTransform = getPointerToJumpTransform("expNormJumpTransform"),
+  mod.type, ...)
 
 skewSwapRate(p, params.Q, t.vec, vol.mat, jumpTransform, mod.type, ...)
 

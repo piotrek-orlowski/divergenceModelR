@@ -1,3 +1,4 @@
+
 #' @title Affine model likelihood based on divergence prices
 #' @name modLik
 #' @description Functions for preparing model specification, evaluating the likelihood for the DSQ filtering.
@@ -874,7 +875,7 @@ model_wrapLikelihood_portfolio <- function(data.structure, model.spec, for.estim
 #' @export
 
 model_Likelihood_affineContract <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = DSQ_sqrtFilter, N.points = 5, penalized = FALSE, penalty = 1e12){
-  
+
   # Extract some variables from model specification
   N.factors <- model.spec$N.factors
   params.P <- model.spec$params.P
@@ -885,7 +886,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
   spec.mat <- data.structure$spec.mat
   data.obs <- data.structure$obs.data
   noise.par <- model.spec$noise.par
-  
+
   # Test parameters for vol factor Feller conditions
   feller.check <- model_fellerConditionCheck(params.P = params.P, params.Q = params.Q, N.factors = N.factors)
   logl.penalty <- 0
@@ -901,7 +902,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
   } else {
     logl.penalty <- -penalty * sum( as.numeric(!feller.check$p) * pmin(0,feller.check$pval)^2 + as.numeric(!feller.check$q) * pmin(0, feller.check$qval)^2)
   }
-  
+
   # solve ODEs for pricing
   ode.solutions <- tryCatch(
     Re(odeExtSolveWrap(
@@ -917,7 +918,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
       print(e)
       return(-1e15)
     })
-  
+
   # Calculate model dynamics coefficients
   model.dynamics <- tryCatch(
     modelDynamics(
@@ -935,14 +936,14 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
       print(e)
       return(-1e15)
     })
-  
+
   # Transition equation setup
   vol.cov.array <- model.dynamics$cov.array[-1,-1]
   transition.parameters <- list(
     mean.vec = model.dynamics$mean.vec[-1],
     cov.array = vol.cov.array[lower.tri(matrix(0,N.factors,N.factors),diag = T)]
   )
-  
+
   # Observation equation setup
   observation.parameters <- list(
     stockParams = list(mean.vec = model.dynamics$mean.vec, cov.array = model.dynamics$cov.array[lower.tri(diag(1+N.factors),diag = T)]),
@@ -954,7 +955,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
     tVec = spec.mat[,"t"],
     errSdParVec = noise.par
   )
-  
+
   # Long-term means under Q
   v.0 <- unlist(params.Q)
   v.0 <- v.0[grepl("eta",names(v.0))]
@@ -982,7 +983,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
     })
     q.init.state[,kk] <- drop(init.state.loc)
   }
-  
+
   q.init.state <- drop(q.init.state)
   if(is.null(dim(q.init.state))){
     q.init.state <- matrix(q.init.state,ncol=1)
@@ -990,7 +991,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
   q.init.state <- 1e5 * (q.init.state[2,]-q.init.state[1,])
   q.init.state <- Re(matrix(rep(q.init.state,2), ncol = 1))
   q.init.state[which(is.infinite(q.init.state))] <- 100.0
-  
+
   # Initial state values -- long-term means under P
   init.state <- matrix(0,nrow = 2, ncol = N.factors)
   v.0 <- unlist(params.P)
@@ -1018,14 +1019,14 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
     })
     init.state[,kk] <- drop(init.state.loc)
   }
-  
+
   init.state <- drop(init.state)
   if(is.null(dim(init.state))){
     init.state <- matrix(init.state,ncol=1)
   }
   init.state <- 1e5 * (init.state[2,]-init.state[1,])
   init.state <- Re(matrix(rep(init.state,2), ncol = 1))
-  
+
   # check stationarity under P and Q (approximate)
   eta.P <- unlist(sapply(params.P,function(x) x$eta))
   eta.Q <- unlist(sapply(params.Q,function(x) x$eta))
@@ -1034,14 +1035,14 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
   stat.penalty <- c(stat.penalty, as.numeric(q.init.state[1:N.factors]/eta.Q >= 10) * pmax(0, q.init.state[1:N.factors]/eta.Q - 10)^2)
   stat.penalty <- -penalty * sum(stat.penalty)
   logl.penalty <- logl.penalty + stat.penalty
-  
+
   init.vol <- matrix(0,2*N.factors,2*N.factors)
   init.vol[1:N.factors,1:N.factors] <- covMatFun(
     covListS = vol.cov.array[lower.tri(x = diag(N.factors),diag = T)],
     covListDim = c(N.factors,N.factors),
     currVol = init.state[1:N.factors,1,drop=F]
   )
-  
+
   filtering.result <- tryCatch(filterFoo(
     dataMat = data.obs,
     initState = init.state,
@@ -1053,7 +1054,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
     list(logL = -1e15)
   }
   )
-  
+
   if(for.estimation){
     return(sum(filtering.result$logL + logl.penalty))
   } else {
@@ -1066,7 +1067,7 @@ model_Likelihood_affineContract <- function(data.structure, model.spec, for.esti
 #' @export
 
 model_wrapLikelihood_affineContract <- function(data.structure, model.spec, for.estimation = FALSE, filterFoo = divergenceModelR:::portfolio_sqrtFilter, N.points = 5, penalized = FALSE, penalty){
-  
+
   retFoo <- function(par.vec){
     noise.par <- tail(par.vec,1)
     par.vec <- head(par.vec,-1)
@@ -1074,11 +1075,11 @@ model_wrapLikelihood_affineContract <- function(data.structure, model.spec, for.
     par.list <- model_translateParameters(par.vec = par.vec, par.names = model.spec$par.names, par.restr = model.spec$par.restr, N.factors = model.spec$N.factors)
     model.spec$params.P <- par.list$P
     model.spec$params.Q <- par.list$Q
-    
+
     logLik <- model_Likelihood_affineContract(data.structure = data.structure, model.spec = model.spec, for.estimation = for.estimation, filterFoo = filterFoo, N.points = N.points, penalized = penalized, penalty = penalty)
-    
+
     return(logLik)
   }
-  
+
   return(retFoo)
 }

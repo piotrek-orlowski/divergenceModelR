@@ -13,7 +13,8 @@ Depends:
     affineModelR,
     SparseGrid,
     ukfRcpp,
-    dplyr
+    dplyr,
+    mgcv
 Imports:
     Rcpp,
     RcppArmadillo,
@@ -24,4 +25,4 @@ LinkingTo: Rcpp,
     RcppArmadillo,
     ukfRcpp,
     affineModelR
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

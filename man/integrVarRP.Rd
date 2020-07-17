@@ -4,8 +4,8 @@
 \alias{integrVarRP}
 \title{Integrated variance risk premia}
 \usage{
-integrVarRP(params.structure, v.0 = NULL, tT = c(0, 1), grid.d = 1000,
-  N.factors = 3)
+integrVarRP(params.structure, v.0 = NULL, tT = c(0, 1),
+  grid.d = 1000, N.factors = 3)
 }
 \arguments{
 \item{params.structure}{a named list of named lists that describe the \code{P} and \code{Q} behaviour of the stochastic volatility model.}

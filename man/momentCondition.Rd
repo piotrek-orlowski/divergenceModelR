@@ -4,8 +4,8 @@
 \alias{momentCondition}
 \title{This function calculates the general iterative moment condition that can be used for moment based model calibration. Futures prices (with some long expiry) are assumed for the stock!}
 \usage{
-momentCondition(params.P, params.Q, condition.struct, conditional = FALSE,
-  atol = 1e-30, rtol = 1e-12, rtol.Q = rtol,
+momentCondition(params.P, params.Q, condition.struct,
+  conditional = FALSE, atol = 1e-30, rtol = 1e-12, rtol.Q = rtol,
   N.factors = (length(params.P) - 1),
   jumpTransform = getPointerToJumpTransform("expNormJumpTransform")$TF,
   mod.type = "standard", ...)
