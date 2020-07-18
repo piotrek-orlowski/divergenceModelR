@@ -2,7 +2,7 @@
 ## LD_LIBRARY_PATH += $(HOME)/lib/R-4.0.0/affineModelR/libs
 ## LD_LIBRARY_PATH += $(HOME)/lib/R-4.0.0/ukfRcpp/libs
 
-PKG_LIBS += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lz -L$(HOME)/lib/R-4.0.0/affineModelR/libs -L$(HOME)/lib/R-4.0.0/ukfRcpp/libs -l$(HOME)/lib/R-4.0.0/ukfRcpp/libs/ukfRcpp.so -l$(HOME)/lib/R-4.0.0/affineModelR/libs/affineModelR.so
+PKG_LIBS += `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lz -L$(HOME)/lib/R-4.0.0/affineModelR/libs -L$(HOME)/lib/R-4.0.0/ukfRcpp/libs -lukfRcpp -laffineModelR
 PKG_CXXFLAGS = -fpermissive
 ## PKG_CPPFLAGS = -I$(HOME)/lib/R-4.0.0/ukfRcpp/include -I$(HOME)/lib/R-4.0.0/affineModelR/libs/include
 ## PKG_CFLAGS= -fpermissive
